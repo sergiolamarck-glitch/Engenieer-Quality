@@ -174,7 +174,6 @@
   </div>
 
   <script>
-    // Banco de Dados Atualizado com as informações da Tabela da Imagem
     const EARTHING_BOXES = [
       { id: 'E22²', page: '14', dwg: '120033-012', desc: 'EARTHING COPPER BAR 300X40 mm EARTHING STAINLESS STEEL BAR 300x50 mm' },
       { id: 'E23³', page: '15', dwg: '120033-013', desc: 'L70x70x7 mm FOR 1 COMPRESSION CABLE LUG FOR WALL WITH INSULATION' },
@@ -586,7 +585,7 @@
       },
       {
         type: 'internal',
-        category: { pt: "Demais Informações", en: "Other Information", es: "Demás Información", hi: "अन्य जानकारी" },
+        category: { pt: "Demais Informações", en: "Other Information", es: "Demás Información", hi: "Slow जानकारी" },
         items: [
           { id: "dem1", text: "Verificar a consistência geral, correta atribuição de camadas (layers do contratante) e demais informações pertinentes ao desenho.", tag: "Geral" }
         ]
@@ -655,16 +654,16 @@
 
     const DB_TRAYS = {
       Electrical: {
-        Ladder: { typical: "E 54A-D1", lug: "E 08", notes: { pt: "Para elétrica principal, avaliar LUG E08 (p/ 120mm²). O cabo principal é definido no Cable Schedule do projeto." } },
-        Tray: { typical: "E 54A-D2", lug: "E 08", notes: { pt: "Para calhas elétricas de menor altura. LUG aplicado diretamente no Main Copper Wire (MCW)." } }
+        Ladder: { typical: "E 54A-D1", lug: "E 108", boss: "E 22", notes: { pt: "Aterramento Direto: Utiliza LUG E108. O cabo principal é definido no Cable Schedule do projeto." } },
+        Tray: { typical: "E 54A-D2", lug: "E 108", boss: "E 22", notes: { pt: "Aterramento Direto: LUG E108 aplicado diretamente no Main Copper Wire (MCW)." } }
       },
       Instrumental: {
-        Ladder: { typical: "E 54B-D1", lug: "E 09", notes: { pt: "Sistemas de instrumentação e telecomunicações. Avaliar LUG E09/E10 (para cabos de 16mm²)." } },
-        Tray: { typical: "E 54B-D2", lug: "E 10", notes: { pt: "Bandejamento leve para instrumentação. Requer cabos flexíveis 16mm² indoor." } }
+        Ladder: { typical: "E 54B-D1", lug: "E 09", boss: "E 22", notes: { pt: "Aterramento Direto para sistemas de instrumentação. Usa LUG E09 (para cabos de 16mm²)." } },
+        Tray: { typical: "E 54B-D2", lug: "E 09", boss: "E 32B", notes: { pt: "Aterramento Direto de Bandejamento leve. Usa LUG E09." } }
       },
       Lighting: {
-        Ladder: { typical: "E 54C-D1", lug: "E 09", notes: { pt: "Raramente aplicável a iluminação, mas previsto na norma. Usa LUG E09 p/ 16mm²." } },
-        Tray: { typical: "E 54C-D2", lug: "E 10", notes: { pt: "Típico padrão para rotas de iluminação secundária e painéis menores. LUG E10." } }
+        Ladder: { typical: "E 54C-D1", lug: "E 09", boss: "E 22", notes: { pt: "Aterramento Direto aplicável a iluminação. Usa LUG E09 p/ 16mm²." } },
+        Tray: { typical: "E 54C-D2", lug: "E 09", boss: "E 22", notes: { pt: "Aterramento Direto rotas de iluminação secundária. Usa LUG E09." } }
       }
     };
 
@@ -1257,16 +1256,8 @@
 
       let displayTypical = matched.typical;
       let displayLug = matched.lug;
+      let displayBoss = matched.boss || "E 22";
       let extraAlertHtml = '';
-      let displayCableNum = '';
-
-      if (state.trayDisc === 'Electrical') {
-        displayCableNum = '⑱'; // Cabo 18 (Electrical)
-      } else if (state.trayDisc === 'Instrumental') {
-        displayCableNum = '⑫'; // Cabo 12 (Tele/Instrumental)
-      } else if (state.trayDisc === 'Lighting') {
-        displayCableNum = '①';  // Cabo 1 (Lighting)
-      }
 
       let baseTyp = state.trayEnv === 'Indoor' ? 'E 54' : 'E 56';
 
@@ -1274,91 +1265,84 @@
         displayTypical = displayTypical.replace('E 54', 'E 56');
         if (state.traySpecial === 'none') {
           displayTypical = "E 143-" + (state.trayType === 'Tray' ? 'D2' : 'D1');
+          displayBoss = "E 22";
         }
       }
 
+      // Aplicação da Lógica Unificada de Engenharia
       if (state.traySpecial === 'jumper') {
+        displayBoss = "E 55";
         if (state.trayJumperType === 'comum') {
           displayTypical = "E 55-D1";
-          displayLug = "E 55";
-          extraAlertHtml = `
-            <div class="my-4 p-4 rounded-xl border border-pink-400 bg-pink-50 dark:bg-[#2d1123] dark:border-[#732555] text-left space-y-2 animate-fadeIn shadow-sm">
-              <div class="flex items-center gap-1.5 text-xs font-black uppercase text-pink-700 dark:text-pink-400">▲ ATERRAMENTO PADRÃO E JUMPER</div>
-              <div class="text-xs font-bold text-pink-800 dark:text-pink-200 leading-relaxed uppercase">
-                TÍPICO ATUALIZADO: <span class="bg-pink-200 dark:bg-pink-800 px-1.5 py-0.5 rounded text-brand dark:text-white font-black">${displayTypical}</span>
-              </div>
-            </div>
-          `;
+          displayLug = state.trayDisc === 'Electrical' ? "E 08" : "E 10"; 
         } else if (state.trayJumperType === 'derivacao') {
           displayTypical = "E 55-D3";
-          displayLug = "E 55";
-          extraAlertHtml = `
-            <div class="my-4 p-4 rounded-xl border border-green-500 bg-green-50 dark:bg-[#122e1b] dark:border-[#236b3b] text-left space-y-2 animate-fadeIn shadow-sm">
-              <div class="flex items-center gap-1.5 text-xs font-black uppercase text-green-700 dark:text-green-400">▲ JUMPER DE DERIVAÇÃO</div>
-              <div class="text-xs font-bold text-green-800 dark:text-green-200 leading-relaxed uppercase">TÍPICO SELECIONADO: <span class="bg-green-200 dark:bg-green-800 px-1.5 py-0.5 rounded text-brand dark:text-white font-black">${displayTypical}</span></div>
-            </div>
-          `;
+          displayLug = "E 10"; 
         } else if (state.trayJumperType === 'parallel') {
           displayTypical = "E 55-D5";
-          displayLug = "E 55";
-          extraAlertHtml = `
-            <div class="my-4 p-4 rounded-xl border border-blue-500 bg-blue-50 dark:bg-[#12223a] dark:border-[#234d6b] text-left space-y-2 animate-fadeIn shadow-sm">
-              <div class="flex items-center gap-1.5 text-xs font-black uppercase text-blue-700 dark:text-blue-400">▲ MAIN ELECTRICAL</div>
-              <div class="text-xs font-bold text-blue-800 dark:text-blue-200 leading-relaxed uppercase">TÍPICO SELECIONADO: <span class="bg-blue-200 dark:bg-blue-800 px-1.5 py-0.5 rounded text-brand dark:text-white font-black">${displayTypical}</span></div>
-            </div>
-          `;
+          displayLug = "E 08"; 
         }
-      } else if (state.traySpecial === 'main_tray') {
-        displayTypical = "E 55-D5"; 
-        displayLug = "E 55";
         extraAlertHtml = `
-          <div class="my-4 p-4 rounded-xl border border-yellow-400 bg-yellow-50 dark:bg-yellow-900/40 dark:border-yellow-700 text-left space-y-2 animate-fadeIn">
-            <div class="flex items-center gap-1.5 text-xs font-black uppercase text-yellow-800 dark:text-yellow-300">▲ CONFIGURAÇÃO: MAIN ELECTRICAL</div>
-            <div class="text-xs font-bold text-yellow-700 dark:text-yellow-300 leading-relaxed uppercase">
-              Mapeado com Sucesso para: <span class="bg-yellow-200 dark:bg-yellow-800 px-1.5 py-0.5 rounded text-brand dark:text-white font-black">${displayTypical}</span>
+          <div class="my-4 p-4 rounded-xl border border-emerald-400 bg-emerald-50 dark:bg-brand-darker text-left space-y-2 animate-fadeIn shadow-sm">
+            <div class="flex items-center gap-1.5 text-xs font-black uppercase text-emerald-700 dark:text-emerald-400">▲ CONFIGURAÇÃO DE JUMPER ATIVA</div>
+            <div class="text-xs font-bold text-zinc-600 dark:text-zinc-300 leading-relaxed uppercase">
+              Típico Associado: <span class="bg-brand/5 dark:bg-brand-light px-1.5 py-0.5 rounded text-brand-accent dark:text-white font-black">${displayTypical}</span>
             </div>
           </div>
         `;
+      } else if (state.traySpecial === 'main_tray') {
+        displayTypical = "E 55-D1"; 
+        displayLug = "E 108";
+        displayBoss = "E 55";
       } else if (state.traySpecial === 'cab_16') {
         displayTypical = "Terminal E97 (BUSBAR)";
         displayLug = "E 97";
+        displayBoss = "E 22";
       } else if (state.traySpecial === 'cab_120') {
+        displayBoss = "E 22";
         if (!state.trayE86Modeled) {
           displayTypical = "HOLD E86";
           displayLug = "N/A";
         } else {
           if (state.trayE86Role === 'parallel') {
             displayTypical = "E86 + CABO TIPO 24";
-            displayLug = "E 108 (2 furos)";
+            displayLug = "E 108";
           } else {
             displayTypical = "EARTHING E86";
-            displayLug = "E 08 (1 furo)";
+            displayLug = "E 08";
           }
         }
       }
 
+      // Tratamento das strings para montagem gráfica no SVG
       const cleanLug = displayLug.replace(/\s+/g, '').toUpperCase();
-      let cadLugSymbolMain = '';
-      let lugSymbolSVG = '';
+      const cleanTyp = displayTypical.replace(/\s+/g, '').toUpperCase();
+      
+      const symClass = "stroke-emerald-600 dark:stroke-emerald-400";
+      const fillClass = "fill-emerald-600 dark:fill-emerald-400";
+      const gridClass = "stroke-zinc-200 dark:stroke-zinc-700";
+      const textClass = "fill-zinc-800 dark:fill-zinc-200";
 
-      if (cleanLug.includes('E09')) {
-        cadLugSymbolMain = `<circle cx="262" cy="80" r="12" fill="#22c55e"/>`;
-        lugSymbolSVG = `<svg viewBox="0 0 40 40" class="w-16 h-16 mx-auto"><circle cx="20" cy="20" r="14" fill="#22c55e"/></svg> `;
-      } else if (cleanLug.includes('E10') && !cleanLug.includes('108')) {
-        cadLugSymbolMain = `<polygon points="262,64 248,88 276,88" fill="#22c55e"/>`;
-        lugSymbolSVG = `<svg viewBox="0 0 40 40" class="w-16 h-16 mx-auto"><polygon points="20,6 6,32 34,32" fill="#22c55e" stroke="#22c55e" stroke-linejoin="round"/></svg>`;
-      } else if (cleanLug.includes('E97')) {
-        cadLugSymbolMain = `<g stroke="currentColor" stroke-width="2" fill="none"><path d="M 248 45 L 248 70 L 258 70 L 258 95 L 270 95 L 270 70 L 280 70 L 280 45" /></g><line x1="258" y1="95" x2="270" y2="95" stroke="#22c55e" stroke-width="3"/><line x1="248" y1="112" x2="280" y2="112" stroke="#22c55e" stroke-width="3"/>`;
-        lugSymbolSVG = `<svg viewBox="0 0 40 40" class="w-16 h-16 mx-auto"><g stroke="currentColor" stroke-width="2" fill="none"><path d="M 13 2 L 13 14 L 17 14 L 17 22 L 23 22 L 23 14 L 27 14 L 27 2" /></g></svg>`;
-      } else if (cleanLug.includes('E08')) {
-        cadLugSymbolMain = `<circle cx="265" cy="80" r="6" fill="#22c55e"/>`;
-        lugSymbolSVG = `<svg viewBox="0 0 40 40" class="w-16 h-16 mx-auto"><circle cx="20" cy="20" r="8" fill="#22c55e"/></svg>`;
-      } else if (cleanLug.includes('108')) {
-        cadLugSymbolMain = `<circle cx="256" cy="80" r="6" fill="#22c55e"/><line x1="256" y1="80" x2="284" y2="80" stroke="#22c55e" stroke-width="3"/><circle cx="284" cy="80" r="6" fill="#22c55e"/>`;
-        lugSymbolSVG = `<svg viewBox="0 0 40 40" class="w-16 h-16 mx-auto"><circle cx="10" cy="20" r="6" fill="#22c55e"/><line x1="10" y1="20" x2="30" y2="20" stroke="#22c55e" stroke-width="4"/><circle cx="30" cy="20" r="6" fill="#22c55e"/></svg>`;
-      } else if (cleanLug.includes('E55')) {
-        cadLugSymbolMain = `<path d="M 250 80 L 265 80 L 265 100 L 290 100" fill="none" stroke="#22c55e" stroke-width="3" />`;
-        lugSymbolSVG = `<svg viewBox="0 0 40 40" class="w-16 h-16 mx-auto"><path d="M 4 14 L 16 14 L 16 26 L 36 26" fill="none" stroke="#22c55e" stroke-width="4" /></svg>`;
+      // Linha 1 (Topo): Símbolo dinâmico do LUG
+      let cadLugTopSvg = '';
+      if (cleanLug.includes('E08') || cleanLug.includes('108')) { 
+        cadLugTopSvg = `<line x1="85" y1="20" x2="135" y2="20" class="${symClass}" stroke-width="2"/><circle cx="95" cy="20" r="4.5" class="${fillClass}"/><circle cx="125" cy="20" r="4.5" class="${fillClass}"/>`;
+      } else if (cleanLug.includes('E09')) { 
+        cadLugTopSvg = `<line x1="85" y1="20" x2="135" y2="20" class="${symClass}" stroke-width="2"/><circle cx="110" cy="20" r="4.5" class="${fillClass}"/>`;
+      } else if (cleanLug.includes('E10')) { 
+        cadLugTopSvg = `<line x1="85" y1="20" x2="135" y2="20" class="${symClass}" stroke-width="2"/><polygon points="110,12 101,26 119,26" class="${fillClass}"/>`;
+      } else if (cleanLug.includes('E97')) { 
+        cadLugTopSvg = `<rect x="95" y="14" width="30" height="12" fill="none" class="${symClass}" stroke-width="2"/><line x1="85" y1="20" x2="95" y2="20" class="${symClass}" stroke-width="2"/><line x1="125" y1="20" x2="135" y2="20" class="${symClass}" stroke-width="2"/>`;
+      } else {
+        cadLugTopSvg = `<text x="110" y="24" class="fill-rose-500" font-size="12" font-weight="bold" text-anchor="middle">N/A</text>`;
+      }
+
+      // Linha 2 (Base): Símbolo dinâmico do TÍPICO
+      let cadTypBotSvg = '';
+      if (cleanTyp.includes('E55')) { 
+        cadTypBotSvg = `<polyline points="95,52 107,52 107,78 95,77" fill="none" class="${symClass}" stroke-width="2"/><line x1="107" y1="60" x2="125" y2="60" class="${symClass}" stroke-width="2"/><line x1="107" y1="68" x2="125" y2="68" class="${symClass}" stroke-width="2"/>`;
+      } else { 
+        cadTypBotSvg = `<line x1="85" y1="65" x2="135" y2="65" class="${symClass}" stroke-width="2"/><circle cx="110" cy="65" r="3" class="${fillClass}"/>`;
       }
 
       let html = `
@@ -1399,7 +1383,7 @@
                 
                 <div class="flex flex-wrap gap-2 mb-3">
                   <button onclick="setTraySpecial('none')" class="flex-1 min-w-[80px] py-2.5 px-2 rounded-lg text-[10px] font-bold transition-all border ${state.traySpecial === 'none' ? 'bg-zinc-800 dark:bg-zinc-200 text-white dark:text-brand border-transparent shadow-md' : 'bg-slate-50 dark:bg-brand-darker text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-brand-light hover:bg-zinc-100'}">Padrão</button>
-                  <button onclick="setTraySpecial('main_tray')" class="flex-1 min-w-[100px] py-2.5 px-2 rounded-lg text-[10px] font-bold transition-all border ${state.traySpecial === 'main_tray' ? 'bg-yellow-500 text-white border-transparent shadow-md' : 'bg-slate-50 dark:bg-brand-darker text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-brand-light hover:bg-zinc-100'}">Main Electrical</button>
+                  <button onclick="setTraySpecial('main_tray')" class="flex-1 min-w-[100px] py-2.5 px-2 rounded-lg text-[10px] font-bold transition-all border ${state.traySpecial === 'main_tray' ? 'bg-yellow-500 text-white border-transparent shadow-md' : 'bg-slate-50 dark:bg-brand-darker text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-brand-light hover:bg-zinc-100'}">Main Cable</button>
                   <button onclick="setTraySpecial('jumper')" class="flex-1 min-w-[80px] py-2.5 px-2 rounded-lg text-[10px] font-bold transition-all border ${state.traySpecial === 'jumper' ? 'bg-green-500 text-white border-green-600 shadow-lg scale-[1.02]' : 'bg-slate-50 dark:bg-brand-darker text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-brand-light hover:bg-zinc-100'}">JUMPER</button>
                 </div>
                 
@@ -1412,9 +1396,9 @@
                   <div class="p-4 bg-green-50 dark:bg-[#122e1b] border-2 border-green-300 dark:border-green-800 rounded-xl space-y-3 animate-fadeIn mt-4 shadow-inner">
                     <div class="flex items-center gap-2 mb-2 text-green-800 dark:text-green-400 font-black uppercase text-xs">Selecione o tipo de Jumper</div>
                     <div class="grid grid-cols-3 gap-2">
-                      <button onclick="setTrayJumperType('comum')" class="py-2 px-1 rounded text-[10px] font-black uppercase transition-all border-2 ${state.trayJumperType === 'comum' ? 'bg-pink-500 text-white border-pink-600 shadow-md' : 'bg-white dark:bg-brand-darker text-pink-600 dark:text-pink-400 border-pink-300 dark:border-pink-800'}">PADRÃO E JUMPER</button>
+                      <button onclick="setTrayJumperType('comum')" class="py-2 px-1 rounded text-[10px] font-black uppercase transition-all border-2 ${state.trayJumperType === 'comum' ? 'bg-pink-500 text-white border-pink-600 shadow-md' : 'bg-white dark:bg-brand-darker text-pink-600 dark:text-pink-400 border-pink-300 dark:border-pink-800'}">COMUM</button>
                       <button onclick="setTrayJumperType('derivacao')" class="py-2 px-1 rounded text-[10px] font-black uppercase transition-all border-2 ${state.trayJumperType === 'derivacao' ? 'bg-green-500 text-white border-green-600 shadow-md' : 'bg-white dark:bg-brand-darker text-green-600 dark:text-green-400 border-green-300 dark:border-green-800'}">DERIVAÇÃO</button>
-                      <button onclick="setTrayJumperType('parallel')" class="py-2 px-1 rounded text-[10px] font-black uppercase transition-all border-2 ${state.trayJumperType === 'parallel' ? 'bg-blue-500 text-white border-blue-600 shadow-md' : 'bg-white dark:bg-brand-darker text-blue-600 dark:text-blue-400 border-blue-300 dark:border-blue-800'}">MAIN ELECTRICAL</button>
+                      <button onclick="setTrayJumperType('parallel')" class="py-2 px-1 rounded text-[10px] font-black uppercase transition-all border-2 ${state.trayJumperType === 'parallel' ? 'bg-blue-500 text-white border-blue-600 shadow-md' : 'bg-white dark:bg-brand-darker text-blue-600 dark:text-blue-400 border-blue-300 dark:border-blue-800'}">PARALLEL</button>
                     </div>
                   </div>
                 ` : ''}
@@ -1457,26 +1441,46 @@
 
               ${extraAlertHtml}
 
+              <!-- QUADRO EXCLUSIVO: DETALHAMENTO DE PROJEÇÃO FOCADO APENAS APÓS O EARTHING BOSS -->
               <div class="my-2">
-                <span class="text-[10px] font-bold uppercase tracking-wider block mb-2 text-zinc-400 dark:text-zinc-500">${t.symbologyTitle} (ESTILO CAD)</span>
-                <div class="relative w-full rounded-xl overflow-hidden border border-zinc-300 dark:border-zinc-700 bg-slate-50 dark:bg-[#0f172a] shadow-inner p-4">
-                  <svg viewBox="0 0 400 160" class="w-full h-auto text-zinc-800 dark:text-zinc-200">
-                    <rect width="100%" height="100%" fill="none"/>
-                    <rect x="50" y="30" width="30" height="100" fill="none" stroke="currentColor" stroke-width="2"/>
-                    <line x1="50" y1="30" x2="80" y2="130" stroke="currentColor" stroke-width="2"/>
-                    <line x1="80" y1="30" x2="50" y2="130" stroke="currentColor" stroke-width="2"/>
-                    <circle cx="65" cy="80" r="6" fill="currentColor"/>
-                    <path d="M 65 80 Q 150 10, 250 80" fill="none" stroke="currentColor" stroke-width="2"/>
-                    ${cadLugSymbolMain}
+                <span class="text-[10px] font-black uppercase tracking-wider block mb-2 text-zinc-400 dark:text-zinc-500">Mapeamento Técnico de Plotagem (Estilo CAD)</span>
+                
+                <div class="w-full overflow-x-auto rounded-xl border border-zinc-300 dark:border-zinc-700 bg-slate-100 dark:bg-brand-darker p-3 shadow-inner">
+                  <svg viewBox="0 0 250 90" class="w-full h-auto font-mono font-bold" style="font-family: ui-monospace, monospace;">
+                    <!-- Linhas de Grade e Divisórias -->
+                    <g stroke="currentColor" class="${gridClass}" stroke-width="1.2">
+                      <line x1="0" y1="5" x2="250" y2="5"/>
+                      <line x1="0" y1="45" x2="250" y2="45"/>
+                      <line x1="0" y1="85" x2="250" y2="85"/>
+
+                      <line x1="0" y1="5" x2="0" y2="85"/>
+                      <line x1="50" y1="5" x2="50" y2="85"/>
+                      <line x1="165" y1="5" x2="165" y2="85"/>
+                      <line x1="250" y1="5" x2="250" y2="85"/>
+                    </g>
+
+                    <!-- LINHA 1 (TOPO): Mapeamento de LUGs e Quantidade -->
+                    <text x="25" y="28" class="${textClass}" font-size="13" font-weight="900" text-anchor="middle">1</text>
+                    ${cadLugTopSvg}
+                    <text x="207" y="28" class="fill-emerald-600 dark:fill-emerald-400 font-black" font-size="13" text-anchor="middle">${displayLug}</text>
+
+                    <!-- LINHA 2 (BASE): Mapeamento do Típico e Quantidade -->
+                    <text x="25" y="70" class="${textClass}" font-size="13" font-weight="900" text-anchor="middle">1</text>
+                    ${cadTypBotSvg}
+                    <text x="207" y="70" class="fill-blue-600 dark:fill-blue-400 font-black" font-size="12" text-anchor="middle">${displayTypical}</text>
                   </svg>
                 </div>
               </div>
 
-              <div class="grid ${displayCableNum ? 'grid-cols-4' : 'grid-cols-3'} gap-3 min-h-[120px]">
-                ${displayCableNum ? `<div class="p-3 rounded-lg border bg-slate-50 dark:bg-brand-darker border-zinc-200 dark:border-brand-light text-center flex flex-col justify-center animate-fadeIn"><span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 block mb-2">CABO</span><span class="text-2xl font-black text-brand dark:text-white">${displayCableNum}</span></div>` : ''}
-                <div class="p-3 rounded-lg border bg-slate-50 dark:bg-brand-darker border-zinc-200 dark:border-brand-light text-center flex flex-col justify-center"><span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 block mb-2">LUG</span><span class="text-sm font-black text-brand dark:text-white">${displayLug}</span></div>
-                <div class="p-3 rounded-lg border bg-slate-50 dark:bg-brand-darker border-zinc-200 dark:border-brand-light text-center flex flex-col items-center justify-center"><span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 block mb-2">SÍMBOLO</span><div class="text-[#22c55e]">${lugSymbolSVG}</div></div>
-                <div class="p-3 rounded-lg border bg-slate-50 dark:bg-brand-darker border-zinc-200 dark:border-brand-light text-center flex flex-col justify-center"><span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 block mb-2">Material</span><span class="text-xs font-black text-brand dark:text-white">${state.trayEnv === 'Indoor' ? 'Cobre Estanhado' : 'Aço Inox'}</span></div>
+              <div class="grid grid-cols-2 gap-3 min-h-[90px]">
+                <div class="p-3 rounded-lg border bg-slate-50 dark:bg-brand-darker border-zinc-200 dark:border-brand-light text-center flex flex-col justify-center">
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 block mb-1">CÓDIGO TERMINAL</span>
+                  <span class="text-sm font-black text-brand dark:text-white">${displayLug}</span>
+                </div>
+                <div class="p-3 rounded-lg border bg-slate-50 dark:bg-brand-darker border-zinc-200 dark:border-brand-light text-center flex flex-col items-center justify-center">
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 block mb-1">MATERIAL CONDUTOR</span>
+                  <div class="text-emerald-600 dark:text-emerald-400 font-black text-xs uppercase">${state.trayEnv === 'Indoor' ? 'Cobre Estanhado' : 'Aço Inox'}</div>
+                </div>
               </div>
             </div>
           </div>
