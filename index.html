@@ -62,7 +62,7 @@
         <div>
           <div class="flex items-center gap-1.5">
             <h1 id="header-title" class="text-base font-black tracking-tight text-brand dark:text-white">Engenharia & Qualidade</h1>
-            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-900">▲ REV 3.0</span>
+            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-900">▲ REV 3.1</span>
           </div>
           <p id="header-subtitle" class="text-[10px] font-bold uppercase tracking-widest text-zinc-400 dark:text-brand-light">Painel Integrado: CQ, HVAC, Piping e Bandejas</p>
         </div>
@@ -427,7 +427,7 @@
             </div>
           </div>
 
-          <!-- Conversor Interativo de Tag Movido para o Checklist -->
+          <!-- Conversor Interativo de Tag -->
           <div class="bg-white dark:bg-brand p-5 rounded-xl border border-zinc-200 dark:border-brand-light shadow-sm mb-6 print-break-inside-avoid">
             <div class="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-3">Conversor Interativo de Tag</div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -464,7 +464,6 @@
       `;
       document.getElementById('main-container').innerHTML = html;
       
-      // Atualiza o valor do conversor assim que a tela for renderizada
       updateDmsTagConversion();
     }
 
@@ -618,7 +617,6 @@
       let displayTypical = matched.typical;
       let displayLug = matched.lug;
       let displayBoss = matched.boss || "E 22";
-      let displayCableNum = state.trayDisc === 'Electrical' ? '18' : (state.trayDisc === 'Instrumental' ? '12' : '1');
 
       let baseTyp = state.trayEnv === 'Indoor' ? 'E 54' : 'E 56';
 
@@ -639,19 +637,32 @@
            displayBoss = "E 22";
         }
         
-        // ATERRAMENTO PADRÃO: LUG DE TOPO DEVE SER SEMPRE E108 OU E09 (Símbolos na Cima)
+        // ATERRAMENTO PADRÃO
         if (state.trayDisc === 'Electrical') {
             displayLug = "E 108";
         } else {
             displayLug = "E 09";
         }
       } else if (state.earthingType === 'e55') {
-        displayTypical = "E 55-" + state.e55Detail;
         displayBoss = "E 55";
-        if (state.trayDisc === 'Electrical') {
-          displayLug = (state.e55Detail === 'D2' || state.e55Detail === 'D1') ? "E 108" : "E 08";
+        
+        if (state.e55Detail === 'D5') {
+            displayTypical = "E 55-D5";
+            displayLug = "E 108";
+        } else if (state.e55Detail === 'D3') {
+            displayTypical = "TÍPICO CORRESPONDENTE";
+            if (state.trayDisc === 'Electrical') {
+                displayLug = "E 08";
+            } else {
+                displayLug = state.trayType === 'Ladder' ? "E 09" : "E 10";
+            }
         } else {
-          displayLug = "E 10"; 
+            displayTypical = "E 55-" + state.e55Detail;
+            if (state.trayDisc === 'Electrical') {
+                displayLug = (state.e55Detail === 'D2' || state.e55Detail === 'D1') ? "E 108" : "E 08";
+            } else {
+                displayLug = "E 10"; 
+            }
         }
       } else if (state.earthingType === 'special') {
         if (state.specialType === 'cab_16') {
@@ -669,56 +680,47 @@
 
       const cleanLug = displayLug.replace(/\s+/g, '').toUpperCase();
       const cleanTyp = displayTypical.replace(/\s+/g, '').toUpperCase();
-      const cleanBoss = displayBoss.replace(/\s+/g, '').toUpperCase();
+      const baseCleanTyp = matched.typical.replace(/\s+/g, '').toUpperCase();
       
       const symClass = "stroke-emerald-600 dark:stroke-emerald-400";
       const fillClass = "fill-emerald-600 dark:fill-emerald-400";
-      const textClass = "fill-zinc-800 dark:fill-zinc-200";
       const gridClass = "stroke-zinc-300 dark:stroke-zinc-700";
 
-      // -------------------------------------------------------------
-      // CONSTRUÇÃO DOS SVGs (Regra especial para Típico -D1 vs -D2)
-      // -------------------------------------------------------------
-      
-      // LUG SVG (Topo e Preview Isolado - Viewbox 70x40)
+      // LUG SVG (Topo)
       let svgLugLine = '';
       if (cleanLug.includes('108') || cleanLug.includes('E09')) { 
-        // 1 BOLINHA ISOLADA (Para E108 ou E09)
         svgLugLine = `<circle cx="35" cy="20" r="5" class="${fillClass}"/>`;
       } else if (cleanLug.includes('E08')) { 
-        // 2 BOLINHAS (sem linha contínua que as unifique como um halter)
         svgLugLine = `<circle cx="20" cy="20" r="5" class="${fillClass}"/><circle cx="50" cy="20" r="5" class="${fillClass}"/>`;
       } else if (cleanLug.includes('E10')) { 
-        // TRIÂNGULO (sem linha no fundo)
         svgLugLine = `<polygon points="35,12 27,28 43,28" class="${fillClass}"/>`;
       } else if (cleanLug.includes('E97')) { 
-        // BARRAMENTO
         svgLugLine = `<rect x="25" y="14" width="20" height="12" fill="none" class="${symClass}" stroke-width="2"/><line x1="10" y1="20" x2="25" y2="20" class="${symClass}" stroke-width="2"/><line x1="45" y1="20" x2="60" y2="20" class="${symClass}" stroke-width="2"/>`;
       } else {
         svgLugLine = `<text x="35" y="24" class="fill-rose-500" font-size="12" font-weight="bold" text-anchor="middle">N/A</text>`;
       }
 
-      // TÍPICO SVG (Base e Preview Isolado - Viewbox 70x40)
+      // Referência do Símbolo de Base (Para tratar o Jumper e buscar a simbologia de origem dele)
+      let refTyp = cleanTyp;
+      if (state.earthingType === 'e55' && state.e55Detail === 'D3') {
+          refTyp = baseCleanTyp;
+      }
+
+      // TÍPICO SVG (Base)
       let svgTypLine = '';
-      if (cleanTyp.includes('E55')) { 
-        // GARFO
+      if (refTyp.includes('E55')) { 
         svgTypLine = `<polyline points="20,10 30,10 30,30 20,30" fill="none" class="${symClass}" stroke-width="2"/><line x1="30" y1="16" x2="50" y2="16" class="${symClass}" stroke-width="2"/><line x1="30" y1="24" x2="50" y2="24" class="${symClass}" stroke-width="2"/>`;
-      } else if (cleanTyp.includes('E54A')) {
-        // "PESO" / HALTER (Específico da Elétrica Indoor)
+      } else if (refTyp.includes('E54A')) {
         svgTypLine = `<line x1="20" y1="20" x2="50" y2="20" class="${symClass}" stroke-width="2"/><circle cx="20" cy="20" r="4.5" class="${fillClass}"/><circle cx="50" cy="20" r="4.5" class="${fillClass}"/>`;
-      } else if (state.trayDisc !== 'Electrical' && cleanTyp.includes('D1')) {
-        // 1 BOLINHA ISOLADA para -D1 (Instrumentação e Iluminação)
+      } else if (state.trayDisc !== 'Electrical' && refTyp.includes('D1')) {
         svgTypLine = `<circle cx="35" cy="20" r="4.5" class="${fillClass}"/>`;
-      } else if (cleanTyp.includes('E54B') || cleanTyp.includes('E54C') || (state.trayDisc !== 'Electrical' && cleanTyp.includes('D2'))) {
-        // TRIÂNGULO
+      } else if (refTyp.includes('E54B') || refTyp.includes('E54C') || (state.trayDisc !== 'Electrical' && refTyp.includes('D2'))) {
         svgTypLine = `<polygon points="35,12 27,28 43,28" class="${fillClass}"/>`;
       } else {
-        // PADRÃO DE SEGURANÇA (1 Bolinha)
         svgTypLine = `<circle cx="35" cy="20" r="4.5" class="${fillClass}"/>`;
       }
 
-      // CAD TABLE PREVIEW (Espelhando fielmente o Plot de Exemplo da imagem)
-      // Variável de Topo: Sempre LUG (E108, E09, etc)
+      // CAD TABLE PREVIEW (Topo LUG)
       let cadLugTopSvg = '';
       if (cleanLug.includes('108') || cleanLug.includes('E09')) { 
         cadLugTopSvg = `<circle cx="105" cy="25" r="5.5" class="${fillClass}"/>`;
@@ -732,20 +734,28 @@
         cadLugTopSvg = `<text x="105" y="29" class="fill-rose-500" font-size="12" font-weight="bold" text-anchor="middle">N/A</text>`;
       }
 
-      // Variável de Base: O Típico de Base (E54A-D1, E54B-D2, etc)
+      // CAD TABLE PREVIEW (Base Típico)
       let cadTypBotSvg = '';
-      if (cleanTyp.includes('E55')) {
+      if (refTyp.includes('E55')) {
          cadTypBotSvg = `<polyline points="95,55 105,55 105,75 95,75" fill="none" class="${symClass}" stroke-width="1.5"/><line x1="105" y1="61" x2="120" y2="61" class="${symClass}" stroke-width="1.5"/><line x1="105" y1="69" x2="120" y2="69" class="${symClass}" stroke-width="1.5"/>`;
-      } else if (cleanTyp.includes('E54A')) {
+      } else if (refTyp.includes('E54A')) {
          cadTypBotSvg = `<line x1="90" y1="65" x2="120" y2="65" class="${symClass}" stroke-width="1.5"/><circle cx="90" cy="65" r="5" class="${fillClass}"/><circle cx="120" cy="65" r="5" class="${fillClass}"/>`;
-      } else if (state.trayDisc !== 'Electrical' && cleanTyp.includes('D1')) {
-         // 1 Bolinha para o -D1 (exceto na Eletrica)
+      } else if (state.trayDisc !== 'Electrical' && refTyp.includes('D1')) {
          cadTypBotSvg = `<circle cx="105" cy="65" r="5" class="${fillClass}"/>`;
-      } else if (cleanTyp.includes('E54B') || cleanTyp.includes('E54C') || (state.trayDisc !== 'Electrical' && cleanTyp.includes('D2'))) {
-         // TRIÂNGULO LIMPO EMBAIXO
+      } else if (refTyp.includes('E54B') || refTyp.includes('E54C') || (state.trayDisc !== 'Electrical' && refTyp.includes('D2'))) {
          cadTypBotSvg = `<polygon points="105,55 95,75 115,75" class="${fillClass}"/>`;
       } else {
          cadTypBotSvg = `<circle cx="105" cy="65" r="5" class="${fillClass}"/>`;
+      }
+      
+      let cadTypicalTextSvg = '';
+      if (displayTypical === 'TÍPICO CORRESPONDENTE') {
+          cadTypicalTextSvg = `
+            <text x="200" y="60" class="fill-emerald-500 dark:fill-emerald-400 font-black" font-size="10" text-anchor="middle">TÍPICO</text>
+            <text x="200" y="74" class="fill-emerald-500 dark:fill-emerald-400 font-black" font-size="9" text-anchor="middle">CORRESPONDENTE</text>
+          `;
+      } else {
+          cadTypicalTextSvg = `<text x="200" y="71" class="fill-emerald-500 dark:fill-emerald-400 font-black" font-size="16" text-anchor="middle">${displayTypical}</text>`;
       }
 
       let html = `
@@ -836,7 +846,7 @@
             <div class="bg-white dark:bg-brand p-6 rounded-xl border border-zinc-200 dark:border-brand-light shadow-sm flex flex-col justify-between h-full min-h-[300px] gap-6">
               <div class="text-center">
                 <span class="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 block mb-4">Resultado de Engenharia</span>
-                <div class="text-4xl lg:text-5xl font-black text-brand dark:text-white tracking-tighter mb-4">${displayTypical}</div>
+                <div class="${displayTypical === 'TÍPICO CORRESPONDENTE' ? 'text-3xl' : 'text-4xl lg:text-5xl'} font-black text-brand dark:text-white tracking-tighter mb-4 transition-all duration-300">${displayTypical}</div>
                 <button id="trays-copy-btn" onclick="copyTextToClipboard('${displayTypical}', 'trays-copy-btn')" class="mx-auto flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-100 dark:bg-brand-darker border border-zinc-200 dark:border-brand-light text-zinc-700 dark:text-zinc-200 text-xs font-bold hover:opacity-80 transition-all">
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar Típico
                 </button>
@@ -870,7 +880,7 @@
 
                     <!-- TÍPICO DE BASE EMBAIXO -->
                     ${cadTypBotSvg}
-                    <text x="200" y="71" class="fill-emerald-500 dark:fill-emerald-400 font-black" font-size="16" text-anchor="middle">${displayTypical}</text>
+                    ${cadTypicalTextSvg}
                   </svg>
                 </div>
               </div>
@@ -889,8 +899,8 @@
 
                 <div class="col-span-2 p-2 rounded-lg border bg-slate-50 dark:bg-brand-darker border-zinc-200 dark:border-brand-light text-center flex flex-col justify-center relative overflow-hidden">
                   <span class="text-[9px] font-bold uppercase tracking-wider text-zinc-400 block mb-1">TÍPICO DE BASE</span>
-                  <div class="text-sm font-black text-brand dark:text-white flex items-center justify-center gap-2 mt-1">
-                     <span class="truncate">${displayTypical}</span>
+                  <div class="font-black text-brand dark:text-white flex items-center justify-center gap-2 mt-1 px-1">
+                     <span class="${displayTypical === 'TÍPICO CORRESPONDENTE' ? 'text-[8.5px] leading-tight text-center' : 'text-sm truncate'}">${displayTypical}</span>
                      <svg viewBox="0 0 70 40" class="w-10 h-6 shrink-0">
                         ${svgTypLine}
                      </svg>
