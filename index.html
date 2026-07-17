@@ -142,7 +142,7 @@
 
     const state = {
       darkMode: false,
-      activeTab: 'bandejas', // Inicia focado em Bandejas
+      activeTab: 'bandejas', 
       checkedItems: {}, 
       sheetName: 'Layout_001',
       
@@ -588,26 +588,33 @@
       let extraAlertHtml = '';
 
       let baseTyp = state.trayEnv === 'Indoor' ? 'E 54' : 'E 56';
+      
+      // Variável auxiliar para garantir que os desenhos SVG permaneçam os mesmos
+      let symbologyLug = displayLug;
 
       if (state.earthingType === 'direct') {
         if (state.trayEnv === 'Indoor') {
           if (state.trayDisc === 'Electrical') {
             displayTypical = state.trayType === 'Ladder' ? "E 54A-D1" : "E 54A-D2";
-            displayLug = "E 108"; displayBoss = "E 22";
+            symbologyLug = "E 108"; displayBoss = "E 22";
           } else if (state.trayDisc === 'Instrumental') {
             displayTypical = state.trayType === 'Ladder' ? "E 54B-D1" : "E 54B-D2";
-            displayLug = state.trayType === 'Ladder' ? "E 09" : "E 10";
+            symbologyLug = state.trayType === 'Ladder' ? "E 09" : "E 10";
             displayBoss = state.trayType === 'Ladder' ? "E 22" : "E 32B";
           } else if (state.trayDisc === 'Lighting') {
             displayTypical = state.trayType === 'Ladder' ? "E 54C-D1" : "E 54C-D2";
-            displayLug = state.trayType === 'Ladder' ? "E 09" : "E 10"; displayBoss = "E 22";
+            symbologyLug = state.trayType === 'Ladder' ? "E 09" : "E 10"; displayBoss = "E 22";
           }
         } else {
            displayTypical = state.trayType === 'Ladder' ? "E 143-D1" : "E 143-D2";
-           if (state.trayDisc === 'Electrical') { displayLug = "E 08"; } 
-           else { displayLug = state.trayType === 'Ladder' ? "E 09" : "E 10"; }
+           if (state.trayDisc === 'Electrical') { symbologyLug = "E 08"; } 
+           else { symbologyLug = state.trayType === 'Ladder' ? "E 09" : "E 10"; }
            displayBoss = "E 22";
         }
+        
+        // Força a escrita explícita do terminal no resultado texto sem corromper a representação gráfica SVG
+        displayLug = state.trayDisc === 'Electrical' ? "E 108" : "E 09";
+        
       } else if (state.earthingType === 'e55') {
         displayTypical = "E 55-" + state.e55Detail;
         displayBoss = "E 55";
@@ -628,12 +635,16 @@
             </div>
           `;
         } else {
-          if (state.trayDisc === 'Electrical') {
+          // SE "MAIN PARALEL WIRE" (D5) for selecionado, GARANTE E 108.
+          if (state.e55Detail === 'D5') {
+            displayLug = "E 108";
+          } else if (state.trayDisc === 'Electrical') {
             displayLug = (state.e55Detail === 'D2' || state.e55Detail === 'D1') ? "E 108" : "E 08";
           } else {
             displayLug = "E 10"; 
           }
         }
+        symbologyLug = displayLug; // Mantém sincronizado para as outras opções
       } else if (state.earthingType === 'special') {
         if (state.specialType === 'cab_16') {
           displayTypical = "Terminal E97"; displayLug = "E 97"; displayBoss = "E 22";
@@ -646,9 +657,10 @@
              displayLug = state.trayE86Role === 'parallel' ? "E 108" : "E 08";
           }
         }
+        symbologyLug = displayLug; // Mantém sincronizado para as outras opções
       }
 
-      const cleanLug = displayLug.replace(/\s+/g, '').toUpperCase();
+      const cleanLug = symbologyLug.replace(/\s+/g, '').toUpperCase();
       const cleanTyp = displayTypical.replace(/\s+/g, '').toUpperCase();
       const cleanBoss = displayBoss.replace(/\s+/g, '').toUpperCase();
       
@@ -658,68 +670,65 @@
       const gridClass = "stroke-zinc-300 dark:stroke-zinc-700";
 
       // -------------------------------------------------------------
-      // CONSTRUÇÃO NATIVA DOS SVGs: Sem replace. Estável e direta.
+      // SVGs REFINADOS - Formas que simulam Terminais (Lugs) Reais
       // -------------------------------------------------------------
       
-      // LUG SVG (Topo e Preview Isolado) - Aceita LUGs e Típicos
       let svgLugLine = '';
       if (cleanLug.includes('108') || cleanLug.includes('E09') || (!cleanLug.includes('E55') && cleanLug.includes('143')) || cleanLug.includes('E54C')) { 
-        // 1 BOLINHA
-        svgLugLine = `<line x1="10" y1="20" x2="60" y2="20" class="${symClass}" stroke-width="2"/><circle cx="35" cy="20" r="4.5" class="${fillClass}"/>`;
+        svgLugLine = `<path d="M15,16 h12 v8 h-12 z" fill="none" class="${symClass}" stroke-width="2"/><path d="M27,16 h10 a4,4 0 0 1 4,4 a4,4 0 0 1 -4,4 h-10 z" fill="none" class="${symClass}" stroke-width="2"/><circle cx="34" cy="20" r="1.5" class="${fillClass}"/><line x1="5" y1="20" x2="15" y2="20" class="${symClass}" stroke-width="2"/>`;
       } else if (cleanLug.includes('E08') || cleanLug.includes('E54A')) { 
-        // 2 BOLINHAS
-        svgLugLine = `<line x1="10" y1="20" x2="60" y2="20" class="${symClass}" stroke-width="2"/><circle cx="25" cy="20" r="4.5" class="${fillClass}"/><circle cx="45" cy="20" r="4.5" class="${fillClass}"/>`;
+        svgLugLine = `<path d="M10,16 h10 v8 h-10 z" fill="none" class="${symClass}" stroke-width="2"/><path d="M20,16 h20 a4,4 0 0 1 4,4 a4,4 0 0 1 -4,4 h-20 z" fill="none" class="${symClass}" stroke-width="2"/><circle cx="27" cy="20" r="1.5" class="${fillClass}"/><circle cx="36" cy="20" r="1.5" class="${fillClass}"/><line x1="2" y1="20" x2="10" y2="20" class="${symClass}" stroke-width="2"/>`;
       } else if (cleanLug.includes('E10') || cleanLug.includes('E54B')) { 
-        // TRIÂNGULO
-        svgLugLine = `<line x1="10" y1="20" x2="60" y2="20" class="${symClass}" stroke-width="2"/><polygon points="35,12 27,28 43,28" class="${fillClass}"/>`;
+        svgLugLine = `<path d="M15,16 h12 v8 h-12 z" fill="none" class="${symClass}" stroke-width="2"/><polygon points="35,12 27,28 43,28" class="${fillClass}"/><line x1="5" y1="20" x2="15" y2="20" class="${symClass}" stroke-width="2"/>`;
       } else if (cleanLug.includes('E97')) { 
-        // BARRAMENTO
         svgLugLine = `<rect x="25" y="14" width="20" height="12" fill="none" class="${symClass}" stroke-width="2"/><line x1="10" y1="20" x2="25" y2="20" class="${symClass}" stroke-width="2"/><line x1="45" y1="20" x2="60" y2="20" class="${symClass}" stroke-width="2"/>`;
       } else {
-        // FALLBACK GERAL (1 Bolinha)
-        svgLugLine = `<line x1="10" y1="20" x2="60" y2="20" class="${symClass}" stroke-width="2"/><circle cx="35" cy="20" r="4.5" class="${fillClass}"/>`;
+        svgLugLine = `<path d="M15,16 h12 v8 h-12 z" fill="none" class="${symClass}" stroke-width="2"/><path d="M27,16 h10 a4,4 0 0 1 4,4 a4,4 0 0 1 -4,4 h-10 z" fill="none" class="${symClass}" stroke-width="2"/><circle cx="34" cy="20" r="1.5" class="${fillClass}"/><line x1="5" y1="20" x2="15" y2="20" class="${symClass}" stroke-width="2"/>`;
       }
 
-      // TÍPICO SVG (Base e Preview Isolado)
+      // TÍPICO SVG Base Isolado
       let svgTypLine = '';
       if (cleanTyp.includes('E55')) { 
-        // GARFO
         svgTypLine = `<polyline points="15,10 25,10 25,30 15,30" fill="none" class="${symClass}" stroke-width="2"/><line x1="25" y1="16" x2="45" y2="16" class="${symClass}" stroke-width="2"/><line x1="25" y1="24" x2="45" y2="24" class="${symClass}" stroke-width="2"/>`;
       } else if (cleanTyp.includes('E54A')) {
-        // 2 BOLINHAS CONECTADAS
-        svgTypLine = `<line x1="10" y1="20" x2="60" y2="20" class="${symClass}" stroke-width="2"/><circle cx="25" cy="20" r="4.5" class="${fillClass}"/><circle cx="45" cy="20" r="4.5" class="${fillClass}"/>`;
+        svgTypLine = `<path d="M10,16 h10 v8 h-10 z" fill="none" class="${symClass}" stroke-width="2"/><path d="M20,16 h20 a4,4 0 0 1 4,4 a4,4 0 0 1 -4,4 h-20 z" fill="none" class="${symClass}" stroke-width="2"/><circle cx="27" cy="20" r="1.5" class="${fillClass}"/><circle cx="36" cy="20" r="1.5" class="${fillClass}"/><line x1="2" y1="20" x2="10" y2="20" class="${symClass}" stroke-width="2"/>`;
       } else if (cleanTyp.includes('E54B') || cleanTyp.includes('E54C')) {
-        // TRIÂNGULO
-        svgTypLine = `<line x1="10" y1="20" x2="60" y2="20" class="${symClass}" stroke-width="2"/><polygon points="35,12 27,28 43,28" class="${fillClass}"/>`;
+        svgTypLine = `<path d="M15,16 h12 v8 h-12 z" fill="none" class="${symClass}" stroke-width="2"/><polygon points="35,12 27,28 43,28" class="${fillClass}"/><line x1="5" y1="20" x2="15" y2="20" class="${symClass}" stroke-width="2"/>`;
       } else {
-        // PADRÃO DE SEGURANÇA (1 Bolinha)
-        svgTypLine = `<line x1="10" y1="20" x2="60" y2="20" class="${symClass}" stroke-width="2"/><circle cx="35" cy="20" r="4.5" class="${fillClass}"/>`;
+        svgTypLine = `<path d="M15,16 h12 v8 h-12 z" fill="none" class="${symClass}" stroke-width="2"/><path d="M27,16 h10 a4,4 0 0 1 4,4 a4,4 0 0 1 -4,4 h-10 z" fill="none" class="${symClass}" stroke-width="2"/><circle cx="34" cy="20" r="1.5" class="${fillClass}"/><line x1="5" y1="20" x2="15" y2="20" class="${symClass}" stroke-width="2"/>`;
       }
 
-      // CAD TABLE PREVIEW (Com suporte aos típicos em cima)
-      let cadLugTopSvg = '';
-      if (cleanLug.includes('108') || cleanLug.includes('E09') || (!cleanLug.includes('E55') && cleanLug.includes('143')) || cleanLug.includes('E54C')) { 
-        cadLugTopSvg = `<line x1="650" y1="15" x2="700" y2="15" class="${symClass}" stroke-width="1.5"/><circle cx="675" cy="15" r="3.5" class="${fillClass}"/>`;
-      } else if (cleanLug.includes('E08') || cleanLug.includes('E54A')) { 
-        cadLugTopSvg = `<line x1="650" y1="15" x2="700" y2="15" class="${symClass}" stroke-width="1.5"/><circle cx="665" cy="15" r="3.5" class="${fillClass}"/><circle cx="685" cy="15" r="3.5" class="${fillClass}"/>`;
-      } else if (cleanLug.includes('E10') || cleanLug.includes('E54B')) { 
-        cadLugTopSvg = `<line x1="650" y1="15" x2="700" y2="15" class="${symClass}" stroke-width="1.5"/><polygon points="675,9 668,21 682,21" class="${fillClass}"/>`;
-      } else if (cleanLug.includes('E97')) { 
-        cadLugTopSvg = `<rect x="665" y="10" width="20" height="10" fill="none" class="${symClass}" stroke-width="1.5"/><line x1="650" y1="15" x2="665" y2="15" class="${symClass}" stroke-width="1.5"/><line x1="685" y1="15" x2="700" y2="15" class="${symClass}" stroke-width="1.5"/>`;
-      } else {
-        cadLugTopSvg = `<line x1="650" y1="15" x2="700" y2="15" class="${symClass}" stroke-width="1.5"/><circle cx="675" cy="15" r="3.5" class="${fillClass}"/>`;
-      }
+      // -------------------------------------------------------------
+      // COORDENADAS DA TABELA CAD CORRIGIDAS - SIMBOLOGIA A ESQUERDA, TEXTO A DIREITA
+      // -------------------------------------------------------------
       
-      let cadTypBotSvg = '';
-      if (cleanTyp.includes('E55')) {
-         cadTypBotSvg = `<polyline points="665,37 675,37 675,53 665,53" fill="none" class="${symClass}" stroke-width="1.5"/><line x1="675" y1="43" x2="690" y2="43" class="${symClass}" stroke-width="1.5"/><line x1="675" y1="47" x2="690" y2="47" class="${symClass}" stroke-width="1.5"/>`;
-      } else if (cleanTyp.includes('E54A')) {
-         cadTypBotSvg = `<line x1="650" y1="45" x2="700" y2="45" class="${symClass}" stroke-width="1.5"/><circle cx="665" cy="45" r="3.5" class="${fillClass}"/><circle cx="685" cy="45" r="3.5" class="${fillClass}"/>`;
-      } else if (cleanTyp.includes('E54B') || cleanTyp.includes('E54C')) {
-         cadTypBotSvg = `<line x1="650" y1="45" x2="700" y2="45" class="${symClass}" stroke-width="1.5"/><polygon points="675,39 668,51 682,51" class="${fillClass}"/>`;
+      let cadLugTopSvgContent = '';
+      if (cleanLug.includes('108') || cleanLug.includes('E09') || (!cleanLug.includes('E55') && cleanLug.includes('143')) || cleanLug.includes('E54C')) { 
+        cadLugTopSvgContent = `<line x1="195" y1="25" x2="235" y2="25" class="${symClass}" stroke-width="1.5"/><circle cx="215" cy="25" r="3.5" class="${fillClass}"/>`;
+      } else if (cleanLug.includes('E08') || cleanLug.includes('E54A')) { 
+        cadLugTopSvgContent = `<line x1="195" y1="25" x2="235" y2="25" class="${symClass}" stroke-width="1.5"/><circle cx="210" cy="25" r="3.5" class="${fillClass}"/><circle cx="220" cy="25" r="3.5" class="${fillClass}"/>`;
+      } else if (cleanLug.includes('E10') || cleanLug.includes('E54B')) { 
+        cadLugTopSvgContent = `<line x1="195" y1="25" x2="235" y2="25" class="${symClass}" stroke-width="1.5"/><polygon points="215,19 208,31 222,31" class="${fillClass}"/>`;
+      } else if (cleanLug.includes('E97')) { 
+        cadLugTopSvgContent = `<rect x="207" y="20" width="16" height="10" fill="none" class="${symClass}" stroke-width="1.5"/><line x1="195" y1="25" x2="207" y2="25" class="${symClass}" stroke-width="1.5"/><line x1="223" y1="25" x2="235" y2="25" class="${symClass}" stroke-width="1.5"/>`;
       } else {
-         cadTypBotSvg = `<line x1="650" y1="45" x2="700" y2="45" class="${symClass}" stroke-width="1.5"/><circle cx="675" cy="45" r="3.5" class="${fillClass}"/>`;
+        cadLugTopSvgContent = `<line x1="195" y1="25" x2="235" y2="25" class="${symClass}" stroke-width="1.5"/><circle cx="215" cy="25" r="3.5" class="${fillClass}"/>`;
       }
+
+      let cadLugTopSvg = `<g transform="translate(-85, 0)">${cadLugTopSvgContent}</g>`;
+      
+      let cadTypBotSvgContent = '';
+      if (cleanTyp.includes('E55')) {
+         cadTypBotSvgContent = `<polyline points="210,57 220,57 220,73 210,73" fill="none" class="${symClass}" stroke-width="1.5"/><line x1="220" y1="63" x2="232" y2="63" class="${symClass}" stroke-width="1.5"/><line x1="220" y1="67" x2="232" y2="67" class="${symClass}" stroke-width="1.5"/>`;
+      } else if (cleanTyp.includes('E54A')) {
+         cadTypBotSvgContent = `<line x1="195" y1="65" x2="235" y2="65" class="${symClass}" stroke-width="1.5"/><circle cx="210" cy="65" r="3.5" class="${fillClass}"/><circle cx="220" cy="65" r="3.5" class="${fillClass}"/>`;
+      } else if (cleanTyp.includes('E54B') || cleanTyp.includes('E54C')) {
+         cadTypBotSvgContent = `<line x1="195" y1="65" x2="235" y2="65" class="${symClass}" stroke-width="1.5"/><polygon points="215,59 208,71 222,71" class="${fillClass}"/>`;
+      } else {
+         cadTypBotSvgContent = `<line x1="195" y1="65" x2="235" y2="65" class="${symClass}" stroke-width="1.5"/><circle cx="215" cy="65" r="3.5" class="${fillClass}"/>`;
+      }
+
+      let cadTypBotSvg = `<g transform="translate(-85, 0)">${cadTypBotSvgContent}</g>`;
 
       let currentTag = state.tagInput.replace(/^#/, '');
       let tagParts = currentTag.split('-');
@@ -851,15 +860,17 @@
                       <line x1="0" y1="85" x2="250" y2="85"/>
 
                       <line x1="0" y1="5" x2="0" y2="85"/>
-                      <line x1="165" y1="5" x2="165" y2="85"/>
+                      <line x1="100" y1="5" x2="100" y2="85"/>
                       <line x1="250" y1="5" x2="250" y2="85"/>
                     </g>
 
+                    <!-- SIMBOLOGIA A ESQUERDA E TEXTO A DIREITA -->
                     ${cadLugTopSvg}
-                    <text x="207" y="28" class="fill-emerald-600 dark:fill-emerald-400 font-black" font-size="13" text-anchor="middle">${displayLug}</text>
-
+                    <text x="160" y="30" class="fill-emerald-600 dark:fill-emerald-400 font-black" font-size="12" text-anchor="start">${displayLug}</text>
+                    
                     ${cadTypBotSvg}
-                    <text x="207" y="70" class="fill-blue-600 dark:fill-blue-400 font-black" font-size="12" text-anchor="middle">${displayTypical}</text>
+                    <text x="160" y="70" class="fill-blue-600 dark:fill-blue-400 font-black" font-size="11" text-anchor="start">${displayTypical}</text>
+                    
                   </svg>
                 </div>
               </div>
