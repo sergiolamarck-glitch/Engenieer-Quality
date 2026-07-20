@@ -852,15 +852,6 @@
 
       let cadTypBotSvg = `<g transform="translate(-85, 0)">${cadTypBotSvgContent}</g>`;
 
-      let currentTag = state.tagInput.replace(/^#/, '');
-      let tagParts = currentTag.split('-');
-      if (tagParts.length > 1) {
-        tagParts[tagParts.length - 1] = state.dmsInput;
-        currentTag = tagParts.join('-');
-      } else {
-        currentTag = currentTag + '-' + state.dmsInput;
-      }
-
       let html = `
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-fadeIn">
           
@@ -898,12 +889,7 @@
               </div>
 
               <div class="pt-4 border-t border-zinc-200 dark:border-brand-light">
-                <div class="flex justify-between items-center mb-3">
-                  <span class="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500">4. Tipo de Conexão</span>
-                  <button onclick="openModal('modal-visual-guide')" class="px-3 py-1 rounded border border-indigo-200 text-indigo-700 bg-indigo-50 dark:bg-indigo-900/30 dark:text-indigo-300 dark:border-indigo-800 text-[9px] font-black uppercase hover:bg-indigo-100 transition-colors">
-                    Ver Guia Visual
-                  </button>
-                </div>
+                <span class="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-3 block">4. Tipo de Conexão</span>
                 <div class="flex flex-col gap-2">
                   <button onclick="selectEarthingType('direct')" class="py-3 px-4 rounded-lg text-xs font-bold transition-all text-left border ${state.earthingType === 'direct' ? 'bg-zinc-800 dark:bg-zinc-200 text-white dark:text-brand border-transparent shadow' : 'bg-slate-50 dark:bg-brand-darker text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-brand-light hover:bg-zinc-100'}">
                     1. Aterramento Direto Padrão
@@ -1046,10 +1032,12 @@
         </div>
         
         <!-- Botão Flutuante: Guia Visual de Aterramento (Injetado apenas na aba de bandejas) -->
-        <button onclick="openModal('modal-visual-guide')" class="fixed bottom-6 right-6 z-40 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full p-4 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center group no-print border-2 border-indigo-400 dark:border-indigo-500 outline-none focus:ring-4 focus:ring-indigo-300 dark:focus:ring-indigo-800">
-          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
-            <circle cx="12" cy="12" r="3"/>
+        <button onclick="openModal('modal-visual-guide')" class="fixed bottom-6 right-6 z-40 bg-brand hover:bg-brand-light dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white rounded-full p-4 shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.2)] transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center group no-print border border-brand-light dark:border-indigo-400 outline-none">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="4" x2="12" y2="14"/>
+            <line x1="4" y1="14" x2="20" y2="14"/>
+            <line x1="8" y1="18" x2="16" y2="18"/>
+            <line x1="11" y1="22" x2="13" y2="22"/>
           </svg>
           <span class="absolute right-full mr-4 bg-zinc-800 text-white text-[10px] font-black uppercase tracking-widest px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap pointer-events-none shadow-md border border-zinc-700">
             Guia de Aterramento
