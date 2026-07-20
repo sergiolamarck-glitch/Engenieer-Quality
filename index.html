@@ -616,7 +616,7 @@
               <button onclick="openModal('modal-boxes')" class="mt-2 py-3 rounded-lg border border-brand-accent dark:border-brand-light bg-brand-subtle dark:bg-brand-light/20 text-brand dark:text-white text-xs font-black uppercase tracking-widest flex justify-center items-center gap-2 hover:bg-brand-accent hover:text-white transition-colors">Caixas de Aterramento</button>
             </div>
             
-            <!-- Conversor interativo (Também visível no HVAC) -->
+            <!-- Conversor interativo (Visível no HVAC) -->
             <div class="bg-white dark:bg-brand p-6 rounded-xl border border-zinc-200 dark:border-brand-light shadow-sm space-y-3 mt-auto">
               <div class="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500">Conversor Interativo de Tag</div>
               <div class="grid grid-cols-2 gap-2">
@@ -657,7 +657,7 @@
         </div>
       `;
       document.getElementById('main-container').innerHTML = html;
-      updateDmsTagConversion(); // Atualiza a tag no momento da renderização
+      updateDmsTagConversion(); // Dispara logo no inicio para renderizar corretamente a tag na tela 
     }
 
     function selectTrayEnv(env) { state.trayEnv = env; renderTrays(); }
@@ -711,25 +711,22 @@
         if (state.trayEnv === 'Indoor') {
           if (state.trayDisc === 'Electrical') {
             displayTypical = state.trayType === 'Ladder' ? "E 54A-D1" : "E 54A-D2";
-            symbologyLug = "E 108"; displayBoss = "E 22";
+            displayBoss = "E 22";
           } else if (state.trayDisc === 'Instrumental') {
             displayTypical = state.trayType === 'Ladder' ? "E 54B-D1" : "E 54B-D2";
-            symbologyLug = state.trayType === 'Ladder' ? "E 09" : "E 10";
             displayBoss = state.trayType === 'Ladder' ? "E 22" : "E 32B";
           } else if (state.trayDisc === 'Lighting') {
             displayTypical = state.trayType === 'Ladder' ? "E 54C-D1" : "E 54C-D2";
-            symbologyLug = state.trayType === 'Ladder' ? "E 09" : "E 10"; displayBoss = "E 22";
+            displayBoss = "E 22";
           }
+          symbologyLug = "E 108";
+          displayLug = "E 108";
         } else {
            displayTypical = state.trayType === 'Ladder' ? "E 143-D1" : "E 143-D2";
-           if (state.trayDisc === 'Electrical') { symbologyLug = "E 08"; } 
-           else { symbologyLug = state.trayType === 'Ladder' ? "E 09" : "E 10"; }
+           symbologyLug = "E 08";
+           displayLug = "E 08";
            displayBoss = "E 22";
         }
-        
-        // Força a escrita explícita do terminal no resultado texto sem corromper a representação gráfica SVG
-        displayLug = state.trayDisc === 'Electrical' ? "E 108" : "E 09";
-        
       } else if (state.earthingType === 'e55') {
         displayTypical = "E 55-" + state.e55Detail;
         displayBoss = "E 55";
@@ -853,6 +850,15 @@
       }
 
       let cadTypBotSvg = `<g transform="translate(-85, 0)">${cadTypBotSvgContent}</g>`;
+
+      let currentTag = state.tagInput.replace(/^#/, '');
+      let tagParts = currentTag.split('-');
+      if (tagParts.length > 1) {
+        tagParts[tagParts.length - 1] = state.dmsInput;
+        currentTag = tagParts.join('-');
+      } else {
+        currentTag = currentTag + '-' + state.dmsInput;
+      }
 
       let html = `
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-fadeIn">
