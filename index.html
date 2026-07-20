@@ -657,7 +657,6 @@
         </div>
       `;
       document.getElementById('main-container').innerHTML = html;
-      updateDmsTagConversion(); // Dispara logo no inicio para renderizar corretamente a tag na tela 
     }
 
     function selectTrayEnv(env) { state.trayEnv = env; renderTrays(); }
@@ -724,8 +723,8 @@
            displayBoss = "E 22";
         }
         
-        // Nova Regra: E108 estrito apenas para Elétrica no Direct, O restante ganha E09.
-        displayLug = state.trayDisc === 'Electrical' ? "E 108" : "E 09";
+        // Nova Regra: E108/E08 estrito apenas para Elétrica no Direct, O restante ganha E09 no topo.
+        displayLug = state.trayDisc === 'Electrical' ? (state.trayEnv === 'Outdoor' ? "E 08" : "E 108") : "E 09";
         symbologyLug = displayLug;
         
       } else if (state.earthingType === 'e55') {
@@ -791,20 +790,24 @@
       const textClass = "fill-zinc-800 dark:fill-zinc-200";
       const gridClass = "stroke-zinc-300 dark:stroke-zinc-700";
 
+      // Verifica se a geometria principal é LADDER para aplicar a regra universal visual.
+      const isLadder = state.trayType === 'Ladder';
+
       // -------------------------------------------------------------
       // SVGs REFINADOS - Formas que simulam Terminais (Lugs) Reais
       // -------------------------------------------------------------
       
       let svgLugLine = '';
-      if (cleanLug.includes('108') || cleanLug.includes('E09') || (!cleanLug.includes('E55') && cleanLug.includes('143')) || cleanLug.includes('E54C')) { 
-        svgLugLine = `<path d="M15,16 h12 v8 h-12 z" fill="none" class="${symClass}" stroke-width="2"/><path d="M27,16 h10 a4,4 0 0 1 4,4 a4,4 0 0 1 -4,4 h-10 z" fill="none" class="${symClass}" stroke-width="2"/><circle cx="34" cy="20" r="1.5" class="${fillClass}"/><line x1="5" y1="20" x2="15" y2="20" class="${symClass}" stroke-width="2"/>`;
-      } else if (cleanLug.includes('E08') || cleanLug.includes('E54A')) { 
-        svgLugLine = `<path d="M10,16 h10 v8 h-10 z" fill="none" class="${symClass}" stroke-width="2"/><path d="M20,16 h20 a4,4 0 0 1 4,4 a4,4 0 0 1 -4,4 h-20 z" fill="none" class="${symClass}" stroke-width="2"/><circle cx="27" cy="20" r="1.5" class="${fillClass}"/><circle cx="36" cy="20" r="1.5" class="${fillClass}"/><line x1="2" y1="20" x2="10" y2="20" class="${symClass}" stroke-width="2"/>`;
-      } else if (cleanLug.includes('E10') || cleanLug.includes('E54B')) { 
-        svgLugLine = `<path d="M15,16 h12 v8 h-12 z" fill="none" class="${symClass}" stroke-width="2"/><polygon points="35,12 27,28 43,28" class="${fillClass}"/><line x1="5" y1="20" x2="15" y2="20" class="${symClass}" stroke-width="2"/>`;
-      } else if (cleanLug.includes('E97')) { 
+      if (cleanLug.includes('E97')) { 
         svgLugLine = `<rect x="25" y="14" width="20" height="12" fill="none" class="${symClass}" stroke-width="2"/><line x1="10" y1="20" x2="25" y2="20" class="${symClass}" stroke-width="2"/><line x1="45" y1="20" x2="60" y2="20" class="${symClass}" stroke-width="2"/>`;
+      } else if (cleanLug.includes('E10') && !isLadder) { 
+        // Peso (Halter) para E10 se NÃO for Ladder
+        svgLugLine = `<path d="M15,16 h12 v8 h-12 z" fill="none" class="${symClass}" stroke-width="2"/><circle cx="30" cy="20" r="2.5" class="${fillClass}"/><circle cx="40" cy="20" r="2.5" class="${fillClass}"/><line x1="30" y1="20" x2="40" y2="20" class="${symClass}" stroke-width="2"/><line x1="5" y1="20" x2="15" y2="20" class="${symClass}" stroke-width="2"/>`;
+      } else if (cleanLug.includes('E09') && !isLadder) {
+        // Triângulo
+        svgLugLine = `<path d="M15,16 h12 v8 h-12 z" fill="none" class="${symClass}" stroke-width="2"/><polygon points="35,12 27,28 43,28" class="${fillClass}"/><line x1="5" y1="20" x2="15" y2="20" class="${symClass}" stroke-width="2"/>`;
       } else {
+        // Bolinha única (1 hole) - Usado para Ladder, E108, E08, E54A, E143
         svgLugLine = `<path d="M15,16 h12 v8 h-12 z" fill="none" class="${symClass}" stroke-width="2"/><path d="M27,16 h10 a4,4 0 0 1 4,4 a4,4 0 0 1 -4,4 h-10 z" fill="none" class="${symClass}" stroke-width="2"/><circle cx="34" cy="20" r="1.5" class="${fillClass}"/><line x1="5" y1="20" x2="15" y2="20" class="${symClass}" stroke-width="2"/>`;
       }
 
@@ -812,11 +815,14 @@
       let svgTypLine = '';
       if (cleanTyp.includes('E55')) { 
         svgTypLine = `<polyline points="15,10 25,10 25,30 15,30" fill="none" class="${symClass}" stroke-width="2"/><line x1="25" y1="16" x2="45" y2="16" class="${symClass}" stroke-width="2"/><line x1="25" y1="24" x2="45" y2="24" class="${symClass}" stroke-width="2"/>`;
-      } else if (cleanTyp.includes('E54A')) {
-        svgTypLine = `<path d="M10,16 h10 v8 h-10 z" fill="none" class="${symClass}" stroke-width="2"/><path d="M20,16 h20 a4,4 0 0 1 4,4 a4,4 0 0 1 -4,4 h-20 z" fill="none" class="${symClass}" stroke-width="2"/><circle cx="27" cy="20" r="1.5" class="${fillClass}"/><circle cx="36" cy="20" r="1.5" class="${fillClass}"/><line x1="2" y1="20" x2="10" y2="20" class="${symClass}" stroke-width="2"/>`;
-      } else if (cleanTyp.includes('E54B') || cleanTyp.includes('E54C')) {
+      } else if (cleanTyp.includes('E54B') && !isLadder) {
+        // Triângulo
         svgTypLine = `<path d="M15,16 h12 v8 h-12 z" fill="none" class="${symClass}" stroke-width="2"/><polygon points="35,12 27,28 43,28" class="${fillClass}"/><line x1="5" y1="20" x2="15" y2="20" class="${symClass}" stroke-width="2"/>`;
+      } else if (cleanTyp.includes('E54C') && !isLadder) {
+        // Peso
+        svgTypLine = `<path d="M15,16 h12 v8 h-12 z" fill="none" class="${symClass}" stroke-width="2"/><circle cx="30" cy="20" r="2.5" class="${fillClass}"/><circle cx="40" cy="20" r="2.5" class="${fillClass}"/><line x1="30" y1="20" x2="40" y2="20" class="${symClass}" stroke-width="2"/><line x1="5" y1="20" x2="15" y2="20" class="${symClass}" stroke-width="2"/>`;
       } else {
+        // Bolinha única (1 hole) - Usado para Ladder, E54A, E143
         svgTypLine = `<path d="M15,16 h12 v8 h-12 z" fill="none" class="${symClass}" stroke-width="2"/><path d="M27,16 h10 a4,4 0 0 1 4,4 a4,4 0 0 1 -4,4 h-10 z" fill="none" class="${symClass}" stroke-width="2"/><circle cx="34" cy="20" r="1.5" class="${fillClass}"/><line x1="5" y1="20" x2="15" y2="20" class="${symClass}" stroke-width="2"/>`;
       }
 
@@ -825,15 +831,14 @@
       // -------------------------------------------------------------
       
       let cadLugTopSvgContent = '';
-      if (cleanLug.includes('108') || cleanLug.includes('E09') || (!cleanLug.includes('E55') && cleanLug.includes('143')) || cleanLug.includes('E54C')) { 
-        cadLugTopSvgContent = `<line x1="195" y1="25" x2="235" y2="25" class="${symClass}" stroke-width="1.5"/><circle cx="215" cy="25" r="3.5" class="${fillClass}"/>`;
-      } else if (cleanLug.includes('E08') || cleanLug.includes('E54A')) { 
-        cadLugTopSvgContent = `<line x1="195" y1="25" x2="235" y2="25" class="${symClass}" stroke-width="1.5"/><circle cx="210" cy="25" r="3.5" class="${fillClass}"/><circle cx="220" cy="25" r="3.5" class="${fillClass}"/>`;
-      } else if (cleanLug.includes('E10') || cleanLug.includes('E54B')) { 
-        cadLugTopSvgContent = `<line x1="195" y1="25" x2="235" y2="25" class="${symClass}" stroke-width="1.5"/><polygon points="215,19 208,31 222,31" class="${fillClass}"/>`;
-      } else if (cleanLug.includes('E97')) { 
+      if (cleanLug.includes('E97')) { 
         cadLugTopSvgContent = `<rect x="207" y="20" width="16" height="10" fill="none" class="${symClass}" stroke-width="1.5"/><line x1="195" y1="25" x2="207" y2="25" class="${symClass}" stroke-width="1.5"/><line x1="223" y1="25" x2="235" y2="25" class="${symClass}" stroke-width="1.5"/>`;
+      } else if (cleanLug.includes('E10') && !isLadder) { 
+        cadLugTopSvgContent = `<line x1="195" y1="25" x2="235" y2="25" class="${symClass}" stroke-width="1.5"/><circle cx="210" cy="25" r="2.5" class="${fillClass}"/><circle cx="220" cy="25" r="2.5" class="${fillClass}"/><line x1="210" y1="25" x2="220" y2="25" class="${symClass}" stroke-width="2"/>`;
+      } else if (cleanLug.includes('E09') && !isLadder) {
+        cadLugTopSvgContent = `<line x1="195" y1="25" x2="235" y2="25" class="${symClass}" stroke-width="1.5"/><polygon points="215,19 208,31 222,31" class="${fillClass}"/>`;
       } else {
+        // Single Bolinha
         cadLugTopSvgContent = `<line x1="195" y1="25" x2="235" y2="25" class="${symClass}" stroke-width="1.5"/><circle cx="215" cy="25" r="3.5" class="${fillClass}"/>`;
       }
 
@@ -842,15 +847,25 @@
       let cadTypBotSvgContent = '';
       if (cleanTyp.includes('E55')) {
          cadTypBotSvgContent = `<polyline points="210,57 220,57 220,73 210,73" fill="none" class="${symClass}" stroke-width="1.5"/><line x1="220" y1="63" x2="232" y2="63" class="${symClass}" stroke-width="1.5"/><line x1="220" y1="67" x2="232" y2="67" class="${symClass}" stroke-width="1.5"/>`;
-      } else if (cleanTyp.includes('E54A')) {
-         cadTypBotSvgContent = `<line x1="195" y1="65" x2="235" y2="65" class="${symClass}" stroke-width="1.5"/><circle cx="210" cy="65" r="3.5" class="${fillClass}"/><circle cx="220" cy="65" r="3.5" class="${fillClass}"/>`;
-      } else if (cleanTyp.includes('E54B') || cleanTyp.includes('E54C')) {
+      } else if (cleanTyp.includes('E54B') && !isLadder) {
          cadTypBotSvgContent = `<line x1="195" y1="65" x2="235" y2="65" class="${symClass}" stroke-width="1.5"/><polygon points="215,59 208,71 222,71" class="${fillClass}"/>`;
+      } else if (cleanTyp.includes('E54C') && !isLadder) {
+         cadTypBotSvgContent = `<line x1="195" y1="65" x2="235" y2="65" class="${symClass}" stroke-width="1.5"/><circle cx="210" cy="65" r="2.5" class="${fillClass}"/><circle cx="220" cy="65" r="2.5" class="${fillClass}"/><line x1="210" y1="65" x2="220" y2="65" class="${symClass}" stroke-width="2"/>`;
       } else {
+         // Single Bolinha
          cadTypBotSvgContent = `<line x1="195" y1="65" x2="235" y2="65" class="${symClass}" stroke-width="1.5"/><circle cx="215" cy="65" r="3.5" class="${fillClass}"/>`;
       }
 
       let cadTypBotSvg = `<g transform="translate(-85, 0)">${cadTypBotSvgContent}</g>`;
+
+      let currentTag = state.tagInput.replace(/^#/, '');
+      let tagParts = currentTag.split('-');
+      if (tagParts.length > 1) {
+        tagParts[tagParts.length - 1] = state.dmsInput;
+        currentTag = tagParts.join('-');
+      } else {
+        currentTag = currentTag + '-' + state.dmsInput;
+      }
 
       let html = `
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-fadeIn">
@@ -889,7 +904,9 @@
               </div>
 
               <div class="pt-4 border-t border-zinc-200 dark:border-brand-light">
-                <span class="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-3 block">4. Tipo de Conexão</span>
+                <div class="flex justify-between items-center mb-3">
+                  <span class="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500">4. Tipo de Conexão</span>
+                </div>
                 <div class="flex flex-col gap-2">
                   <button onclick="selectEarthingType('direct')" class="py-3 px-4 rounded-lg text-xs font-bold transition-all text-left border ${state.earthingType === 'direct' ? 'bg-zinc-800 dark:bg-zinc-200 text-white dark:text-brand border-transparent shadow' : 'bg-slate-50 dark:bg-brand-darker text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-brand-light hover:bg-zinc-100'}">
                     1. Aterramento Direto Padrão
