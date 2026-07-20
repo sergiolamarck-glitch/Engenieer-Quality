@@ -53,7 +53,7 @@
     ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
   </style>
 </head>
-<body class="antialiased transition-colors duration-300 bg-slate-50 text-zinc-900 dark:bg-brand-darker dark:text-zinc-100 min-h-screen flex flex-col">
+<body class="antialiased transition-colors duration-300 bg-slate-50 text-zinc-900 dark:bg-brand-darker dark:text-zinc-100 min-h-screen flex flex-col relative">
 
   <header class="no-print bg-white dark:bg-brand border-b border-zinc-200 dark:border-brand-light sticky top-0 z-40 shadow-sm transition-colors">
     <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
@@ -100,6 +100,7 @@
   <main id="main-container" class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
   </main>
 
+  <!-- Modal Caixas de Aterramento -->
   <div id="modal-boxes" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/70 backdrop-blur-sm no-print transition-all">
     <div class="relative w-full max-w-4xl max-h-[90vh] rounded-xl shadow-2xl flex flex-col bg-white dark:bg-brand border border-zinc-200 dark:border-brand-light">
       <div class="flex items-center justify-between px-6 py-4 border-b border-zinc-200 dark:border-brand-light bg-slate-50 dark:bg-brand-darker rounded-t-xl">
@@ -127,17 +128,85 @@
     </div>
   </div>
 
+  <!-- Modal Guia Visual -->
+  <div id="modal-visual-guide" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/70 backdrop-blur-sm no-print transition-all">
+    <div class="relative w-full max-w-2xl rounded-xl shadow-2xl flex flex-col bg-white dark:bg-brand border border-zinc-200 dark:border-brand-light">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-zinc-200 dark:border-brand-light bg-slate-50 dark:bg-brand-darker rounded-t-xl">
+        <h2 class="text-sm font-black text-brand dark:text-white uppercase tracking-tight">Guia de Aterramento (Lógica e Símbolos)</h2>
+        <button onclick="closeModal('modal-visual-guide')" class="p-2 rounded-lg transition-colors hover:bg-zinc-200 dark:hover:bg-brand-accent text-zinc-500 dark:text-zinc-300">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+      <div class="p-6">
+        <svg viewBox="0 0 500 200" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
+          <style>
+            .text-base-svg { font-family: sans-serif; font-size: 14px; font-weight: bold; fill: #64748b; }
+            .stroke-main { stroke: #000; stroke-width: 2; fill: none; }
+            .stroke-highlight { stroke: #9333ea; stroke-width: 3; fill: none; }
+            .fill-highlight { fill: #22c55e; }
+            .fill-stroke { fill: #22c55e; stroke: #22c55e; stroke-width: 1; }
+            .dark .text-base-svg { fill: #cbd5e1; }
+            .dark .stroke-main { stroke: #cbd5e1; }
+          </style>
+          
+          <text x="80" y="30" class="text-base-svg" text-anchor="middle">E108 / E08</text>
+          <text x="420" y="30" class="text-base-svg" text-anchor="middle">E08, E09, E10</text>
+
+          <rect x="50" y="60" width="60" height="120" class="stroke-main" stroke="#22c55e" fill="#f0fdf4"/>
+          <line x1="50" y1="60" x2="110" y2="180" class="stroke-main" stroke="#22c55e"/>
+          <line x1="110" y1="60" x2="50" y2="180" class="stroke-main" stroke="#22c55e"/>
+          <circle cx="80" cy="120" r="10" class="fill-highlight"/>
+
+          <line x1="390" y1="60" x2="390" y2="180" class="stroke-main"/>
+          <line x1="450" y1="60" x2="450" y2="180" class="stroke-main"/>
+          <line x1="390" y1="80" x2="450" y2="80" class="stroke-main"/>
+          <line x1="390" y1="110" x2="450" y2="110" class="stroke-main"/>
+          <line x1="390" y1="140" x2="450" y2="140" class="stroke-main"/>
+
+          <circle cx="420" cy="80" r="6" class="fill-highlight" transform="translate(0, -10)"/>
+          <polygon points="420,110 412,125 428,125" class="fill-stroke" transform="translate(0, -10)"/>
+          
+          <g transform="translate(0, -10)">
+              <circle cx="410" cy="140" r="5" class="fill-highlight"/>
+              <circle cx="430" cy="140" r="5" class="fill-highlight"/>
+              <line x1="410" y1="140" x2="430" y2="140" class="stroke-main" stroke="#22c55e" stroke-width="3"/>
+          </g>
+
+          <path d="M90,120 C200,50 300,50 410,115" class="stroke-highlight" stroke-dasharray="4"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
   <script>
     const EARTHING_BOXES = [
-      { id: 'E22²', page: '14', dwg: '120033-012', desc: 'EARTHING COPPER BAR 300X40 mm EARTHING STAINLESS STEEL BAR 300x50 mm' },
-      { id: 'E23³', page: '15', dwg: '120033-013', desc: 'L70x70x7 mm FOR 1 COMPRESSION CABLE LUG FOR WALL WITH INSULATION' },
-      { id: 'E15', page: '12', dwg: '120033-010', desc: 'EARTHING COPPER BAR 300X40 mm EARTHING STAINLESS STEEL BAR 300x50 mm' },
-      { id: 'E32', page: '18', dwg: '120033-016', desc: 'EARTHING COPPER BAR 300X40 mm FOR WALLS WITH INSULATION' },
-      { id: 'E30', page: '18', dwg: '120033-016', desc: 'L70x70x7 mm FOR 1 COMPRESSION CABLE LUG FOR WALL WITH INSULATION' },
-      { id: 'E31 ( 4 furos)', page: '67', dwg: '120033-065', desc: 'L70x70x7 mm FOR 1 COMPRESSION CABLE LUG (4HOLES) FOR WALL WITH INSULATION' },
-      { id: 'E31 ( 2 furos)', page: '67', dwg: '120033-065', desc: 'L70x70x7 mm FOR 1 COMPRESSION CABLE LUG (2 HOLES) FOR WALL WITH INSULATION' },
-      { id: 'E38', page: '22', dwg: '120033-020', desc: 'L70x70x7 mm FOR 1 COMPRESSION CABLE LUG FOR WALL WITH INSULATION' },
-      { id: 'E96', displayName: 'E96 (4) <br><span class="text-rose-500 font-bold tracking-tight text-[9px]">(APENAS SALAS GIS de 66 kV 1/2)</span>', page: '15', dwg: '120033-013', desc: 'EARTHING COPPER BAR 300X40 mm EARTHING STAINLESS STEEL BAR 300x50 mm' }
+      { id: 'E22²', page: '14', dwg: '120033-012', desc: 'EARTHING COPPER BAR 300X40 mm EARTHING STAINLESS STEEL BAR 300x50 mm',
+        svg: `<svg viewBox="0 0 40 20" class="w-10 h-5 stroke-current fill-none" stroke-width="1.5"><rect x="2" y="2" width="36" height="16"/><line x1="2" y1="2" x2="38" y2="18"/><line x1="38" y1="2" x2="2" y2="18"/></svg>`
+      },
+      { id: 'E23³', page: '15', dwg: '120033-013', desc: 'L70x70x7 mm FOR 1 COMPRESSION CABLE LUG FOR WALL WITH INSULATION',
+        svg: `<svg viewBox="0 0 40 20" class="w-10 h-5 stroke-current fill-none" stroke-width="1.5"><rect x="2" y="2" width="36" height="16"/><line x1="2" y1="2" x2="38" y2="18"/><line x1="38" y1="2" x2="2" y2="18"/><polygon points="2,2 20,10 2,18" class="fill-current"/></svg>`
+      },
+      { id: 'E15', page: '12', dwg: '120033-010', desc: 'EARTHING COPPER BAR 300X40 mm EARTHING STAINLESS STEEL BAR 300x50 mm',
+        svg: `<svg viewBox="0 0 24 24" class="w-6 h-6 stroke-current fill-none" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>`
+      },
+      { id: 'E32', page: '18', dwg: '120033-016', desc: 'EARTHING COPPER BAR 300X40 mm FOR WALLS WITH INSULATION',
+        svg: `<svg viewBox="0 0 40 24" class="w-10 h-6 stroke-current fill-none" stroke-width="1.5"><line x1="2" y1="2" x2="38" y2="2" stroke-dasharray="2 2"/><rect x="6" y="6" width="28" height="8"/><line x1="6" y1="6" x2="34" y2="14"/><line x1="34" y1="6" x2="6" y2="14"/><polyline points="16,14 16,20 10,20"/></svg>`
+      },
+      { id: 'E30', page: '18', dwg: '120033-016', desc: 'L70x70x7 mm FOR 1 COMPRESSION CABLE LUG FOR WALL WITH INSULATION',
+        svg: `<svg viewBox="0 0 20 40" class="w-4 h-8 stroke-current fill-none" stroke-width="1.5"><rect x="2" y="2" width="16" height="36"/><circle cx="10" cy="30" r="2"/></svg>`
+      },
+      { id: 'E31 ( 4 furos)', page: '67', dwg: '120033-065', desc: 'L70x70x7 mm FOR 1 COMPRESSION CABLE LUG (4HOLES) FOR WALL WITH INSULATION',
+        svg: `<svg viewBox="0 0 40 20" class="w-10 h-5 stroke-current fill-none" stroke-width="1.5"><rect x="2" y="2" width="36" height="16"/><circle cx="8" cy="10" r="1.5"/><circle cx="16" cy="10" r="1.5"/><circle cx="24" cy="10" r="1.5"/><circle cx="32" cy="10" r="1.5"/></svg>`
+      },
+      { id: 'E31 ( 2 furos)', page: '67', dwg: '120033-065', desc: 'L70x70x7 mm FOR 1 COMPRESSION CABLE LUG (2 HOLES) FOR WALL WITH INSULATION',
+        svg: `<svg viewBox="0 0 20 40" class="w-4 h-8 stroke-current fill-none" stroke-width="1.5"><rect x="2" y="2" width="16" height="36"/><circle cx="10" cy="12" r="2"/><circle cx="10" cy="28" r="2"/></svg>`
+      },
+      { id: 'E38', page: '22', dwg: '120033-020', desc: 'L70x70x7 mm FOR 1 COMPRESSION CABLE LUG FOR WALL WITH INSULATION',
+        svg: `<svg viewBox="0 0 40 20" class="w-10 h-5 stroke-current fill-none" stroke-width="1.5"><polyline points="2,16 2,10 10,10 10,4 30,4 30,10 38,10 38,16"/><rect x="2" y="10" width="8" height="6"/><line x1="2" y1="10" x2="10" y2="16"/><line x1="10" y1="10" x2="2" y2="16"/><rect x="30" y="10" width="8" height="6"/><line x1="30" y1="10" x2="38" y2="16"/><line x1="38" y1="10" x2="30" y2="16"/></svg>`
+      },
+      { id: 'E96', displayName: 'E96 (4) <br><span class="text-rose-500 font-bold tracking-tight text-[9px]">(APENAS SALAS GIS de 66 kV 1/2)</span>', page: '15', dwg: '120033-013', desc: 'EARTHING COPPER BAR 300X40 mm EARTHING STAINLESS STEEL BAR 300x50 mm',
+        svg: `<svg viewBox="0 0 40 20" class="w-10 h-5 stroke-current fill-none" stroke-width="1.5"><rect x="2" y="2" width="36" height="16"/><line x1="2" y1="2" x2="38" y2="18"/><line x1="38" y1="2" x2="2" y2="18"/></svg>`
+      }
     ];
 
     const state = {
@@ -296,12 +365,33 @@
       setTimeout(() => { btn.innerHTML = originalText; }, 1500);
     }
 
+    function renderEarthingBoxesTable() {
+      const tbody = document.getElementById('earthing-boxes-tbody');
+      if (!tbody) return;
+      
+      tbody.innerHTML = EARTHING_BOXES.map(box => `
+        <tr class="border-b border-zinc-200 dark:border-brand-light hover:bg-slate-50 dark:hover:bg-brand-light/10 transition-colors">
+          <td class="p-3 font-black text-brand dark:text-brand-accent whitespace-nowrap">${box.displayName || box.id}</td>
+          <td class="p-3 text-center">
+             <div class="inline-flex items-center justify-center text-zinc-700 dark:text-zinc-300">
+                ${box.svg}
+             </div>
+          </td>
+          <td class="p-3 text-center text-zinc-500 dark:text-zinc-400 font-mono">${box.page}</td>
+          <td class="p-3 font-mono text-zinc-600 dark:text-zinc-300">${box.dwg}</td>
+          <td class="p-3 text-[10px] leading-relaxed text-zinc-500 dark:text-zinc-400 uppercase">${box.desc}</td>
+        </tr>
+      `).join('');
+    }
+
     function openModal(modalId) {
       const modal = document.getElementById(modalId);
       if(modal) {
         modal.classList.remove('hidden');
         modal.classList.add('flex');
-        if (modalId === 'modal-boxes') renderEarthingBoxesTable();
+        if (modalId === 'modal-boxes') {
+          renderEarthingBoxesTable();
+        }
       }
     }
 
@@ -525,6 +615,26 @@
 
               <button onclick="openModal('modal-boxes')" class="mt-2 py-3 rounded-lg border border-brand-accent dark:border-brand-light bg-brand-subtle dark:bg-brand-light/20 text-brand dark:text-white text-xs font-black uppercase tracking-widest flex justify-center items-center gap-2 hover:bg-brand-accent hover:text-white transition-colors">Caixas de Aterramento</button>
             </div>
+            
+            <!-- Conversor interativo (Também visível no HVAC) -->
+            <div class="bg-white dark:bg-brand p-6 rounded-xl border border-zinc-200 dark:border-brand-light shadow-sm space-y-3 mt-auto">
+              <div class="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500">Conversor Interativo de Tag</div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="text-[9px] font-bold text-zinc-400 block mb-1">DMS (6 Dígitos)</label>
+                  <input type="text" id="dms-val-input" value="${state.dmsInput}" oninput="updateDmsTagConversion()" class="w-full bg-slate-50 dark:bg-brand-darker border border-zinc-200 dark:border-brand-light px-2 py-1.5 rounded text-xs font-bold outline-none text-zinc-800 dark:text-white focus:border-brand-accent transition-colors" />
+                </div>
+                <div>
+                  <label class="text-[9px] font-bold text-zinc-400 block mb-1">Tag Base (ID)</label>
+                  <input type="text" id="tag-val-input" value="${state.tagInput}" oninput="updateDmsTagConversion()" class="w-full bg-slate-50 dark:bg-brand-darker border border-zinc-200 dark:border-brand-light px-2 py-1.5 rounded text-xs font-mono outline-none text-zinc-800 dark:text-white focus:border-brand-accent transition-colors" />
+                </div>
+              </div>
+              <div class="mt-3 p-3 bg-slate-100 dark:bg-[#0c141d] border border-zinc-300 dark:border-zinc-700 rounded-lg flex items-center justify-between">
+                <span class="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Tag Convertida:</span>
+                <span id="dms-conversion-result" class="text-sm font-mono font-bold text-brand dark:text-brand-accent select-all"></span>
+              </div>
+            </div>
+
           </div>
 
           <div class="lg:col-span-6 flex flex-col">
@@ -547,6 +657,7 @@
         </div>
       `;
       document.getElementById('main-container').innerHTML = html;
+      updateDmsTagConversion(); // Atualiza a tag no momento da renderização
     }
 
     function selectTrayEnv(env) { state.trayEnv = env; renderTrays(); }
@@ -562,9 +673,11 @@
       const dmsInput = document.getElementById('dms-val-input');
       const tagInput = document.getElementById('tag-val-input');
       const resultEl = document.getElementById('dms-conversion-result');
-      if (!dmsInput || !tagInput || !resultEl) return;
+      if (!dmsInput || !tagInput) return;
+      
       state.dmsInput = dmsInput.value;
       state.tagInput = tagInput.value;
+      
       let tag = state.tagInput.replace(/^#/, ''); 
       let parts = tag.split('-');
       if (parts.length > 1) {
@@ -573,7 +686,9 @@
       } else {
         tag = tag + '-' + state.dmsInput;
       }
-      resultEl.textContent = tag;
+      
+      if (resultEl) resultEl.textContent = tag;
+      
       const cadTableTag = document.getElementById('cad-svg-tag-text');
       if (cadTableTag) cadTableTag.textContent = tag;
     }
@@ -618,7 +733,16 @@
       } else if (state.earthingType === 'e55') {
         displayTypical = "E 55-" + state.e55Detail;
         displayBoss = "E 55";
-        if (state.e55Detail === 'D3') {
+        
+        if (state.e55Detail === 'D1') {
+          // Substitui (plota em cima) o E55-D1 pelo típico correspondente 
+          displayTypical = matched.typical;
+          if (state.trayDisc === 'Electrical') {
+            displayLug = "E 108";
+          } else {
+            displayLug = "E 10";
+          }
+        } else if (state.e55Detail === 'D3') {
           // Na derivação (D3), joga o típico correspondente para cima
           let baseTopTyp = matched.typical;
           if (state.trayEnv === 'Outdoor') {
@@ -639,7 +763,7 @@
           if (state.e55Detail === 'D5') {
             displayLug = "E 108";
           } else if (state.trayDisc === 'Electrical') {
-            displayLug = (state.e55Detail === 'D2' || state.e55Detail === 'D1') ? "E 108" : "E 08";
+            displayLug = (state.e55Detail === 'D2') ? "E 108" : "E 08";
           } else {
             displayLug = "E 10"; 
           }
@@ -730,15 +854,6 @@
 
       let cadTypBotSvg = `<g transform="translate(-85, 0)">${cadTypBotSvgContent}</g>`;
 
-      let currentTag = state.tagInput.replace(/^#/, '');
-      let tagParts = currentTag.split('-');
-      if (tagParts.length > 1) {
-        tagParts[tagParts.length - 1] = state.dmsInput;
-        currentTag = tagParts.join('-');
-      } else {
-        currentTag = currentTag + '-' + state.dmsInput;
-      }
-
       let html = `
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-fadeIn">
           
@@ -820,20 +935,30 @@
                   ` : ''}
                 </div>
               </div>
-            </div>
+              
+              <button onclick="openModal('modal-boxes')" class="mt-4 w-full py-3 rounded-lg border border-brand-accent dark:border-brand-light bg-brand-subtle dark:bg-brand-light/20 text-brand dark:text-white text-xs font-black uppercase tracking-widest flex justify-center items-center gap-2 hover:bg-brand-accent hover:text-white transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                Caixas de Aterramento
+              </button>
 
+            </div>
+            
             <!-- Conversor interativo no Menu de Bandejas para facilitar a vida -->
-            <div class="bg-white dark:bg-brand p-6 rounded-xl border border-zinc-200 dark:border-brand-light shadow-sm space-y-3">
+            <div class="bg-white dark:bg-brand p-6 rounded-xl border border-zinc-200 dark:border-brand-light shadow-sm space-y-3 mt-auto">
               <div class="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500">Conversor Interativo de Tag</div>
               <div class="grid grid-cols-2 gap-2">
                 <div>
                   <label class="text-[9px] font-bold text-zinc-400 block mb-1">DMS (6 Dígitos)</label>
-                  <input type="text" id="dms-val-input" value="${state.dmsInput}" oninput="updateDmsTagConversion()" class="w-full bg-slate-50 dark:bg-brand-darker border border-zinc-200 dark:border-brand-light px-2 py-1.5 rounded text-xs font-bold outline-none text-zinc-800 dark:text-white" />
+                  <input type="text" id="dms-val-input" value="${state.dmsInput}" oninput="updateDmsTagConversion()" class="w-full bg-slate-50 dark:bg-brand-darker border border-zinc-200 dark:border-brand-light px-2 py-1.5 rounded text-xs font-bold outline-none text-zinc-800 dark:text-white focus:border-brand-accent transition-colors" />
                 </div>
                 <div>
                   <label class="text-[9px] font-bold text-zinc-400 block mb-1">Tag Base (ID)</label>
-                  <input type="text" id="tag-val-input" value="${state.tagInput}" oninput="updateDmsTagConversion()" class="w-full bg-slate-50 dark:bg-brand-darker border border-zinc-200 dark:border-brand-light px-2 py-1.5 rounded text-xs font-mono outline-none text-zinc-800 dark:text-white" />
+                  <input type="text" id="tag-val-input" value="${state.tagInput}" oninput="updateDmsTagConversion()" class="w-full bg-slate-50 dark:bg-brand-darker border border-zinc-200 dark:border-brand-light px-2 py-1.5 rounded text-xs font-mono outline-none text-zinc-800 dark:text-white focus:border-brand-accent transition-colors" />
                 </div>
+              </div>
+              <div class="mt-3 p-3 bg-slate-100 dark:bg-[#0c141d] border border-zinc-300 dark:border-zinc-700 rounded-lg flex items-center justify-between">
+                <span class="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Tag Convertida:</span>
+                <span id="dms-conversion-result" class="text-sm font-mono font-bold text-brand dark:text-brand-accent select-all"></span>
               </div>
             </div>
           </div>
@@ -850,6 +975,7 @@
               </div>
 
               <!-- PREVIEW DA TABELA CAD FOCADO NAS ÚLTIMAS COLUNAS -->
+              <div>
                 <span class="text-[10px] font-black uppercase tracking-wider block mb-2 text-zinc-400 dark:text-zinc-500">Mapeamento Técnico de Plotagem (Preview Tabela CAD)</span>
                 
                 <div class="w-full overflow-x-auto rounded-xl border border-zinc-300 dark:border-zinc-700 bg-slate-100 dark:bg-[#0c141d] p-3 shadow-inner">
@@ -906,9 +1032,20 @@
             </div>
           </div>
         </div>
+        
+        <!-- Botão Flutuante: Guia Visual de Aterramento (Injetado apenas na aba de bandejas) -->
+        <button onclick="openModal('modal-visual-guide')" class="fixed bottom-6 right-6 z-40 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full p-4 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center group no-print border-2 border-indigo-400 dark:border-indigo-500 outline-none focus:ring-4 focus:ring-indigo-300 dark:focus:ring-indigo-800">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+          <span class="absolute right-full mr-4 bg-zinc-800 text-white text-[10px] font-black uppercase tracking-widest px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap pointer-events-none shadow-md border border-zinc-700">
+            Guia de Aterramento
+          </span>
+        </button>
       `;
       document.getElementById('main-container').innerHTML = html;
-      updateDmsTagConversion(); // Dispara logo no inicio para renderizar corretamente a tag na tela 
+      updateDmsTagConversion(); // Atualiza a tag no momento da renderização
     }
 
     // Inicialização da Tela
