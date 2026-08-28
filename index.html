@@ -7,6 +7,8 @@
   
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js para o Gráfico Analítico -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <script>
     tailwind.config = {
@@ -23,14 +25,7 @@
             }
           },
           animation: {
-            'fadeIn': 'fadeIn 0.25s ease-out forwards',
-            'pulse': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
-          },
-          keyframes: {
-            fadeIn: {
-              '0%': { opacity: '0', transform: 'translateY(4px)' },
-              '100%': { opacity: '1', transform: 'translateY(0)' }
-            }
+            'fadeIn': 'fadeIn 0.25s ease-out forwards'
           }
         }
       }
@@ -55,7 +50,7 @@
       .print-break-inside-avoid { break-inside: avoid; }
       main { padding: 0 !important; max-width: 100% !important; }
       
-      .print-area-corretor { display: flex !important; align-items: center; }
+      .print-area-corretor { display: flex !important; }
       .print-gray { color: #9ca3af !important; text-decoration: none !important; opacity: 1 !important; }
       .print-strike { text-decoration: line-through !important; color: #000000 !important; opacity: 1 !important; }
     }
@@ -65,6 +60,13 @@
     .dark ::-webkit-scrollbar-thumb:hover { background: #005a7d; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    /* Custom Input Type Range for KPI */
+    input[type=checkbox].kpi-check:checked {
+        background-color: #e11d48;
+        background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
+        border-color: #e11d48;
+    }
   </style>
 </head>
 <body class="antialiased transition-colors duration-300 bg-slate-50 text-zinc-900 dark:bg-brand-darker dark:text-zinc-100 min-h-screen flex flex-col relative">
@@ -76,7 +78,7 @@
         <div>
           <div class="flex items-center gap-1.5">
             <h1 id="header-title" class="text-base font-black tracking-tight text-brand dark:text-white">Engenharia & Qualidade</h1>
-            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-900">▲ REV 2.6</span>
+            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-900">▲ REV 2.7</span>
           </div>
           <p id="header-subtitle" class="text-[10px] font-bold uppercase tracking-widest text-zinc-400 dark:text-brand-light">Painel Integrado: CQ, HVAC, Piping e Bandejas</p>
         </div>
@@ -114,7 +116,9 @@
   <main id="main-container" class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
   </main>
 
-  <!-- Modais -->
+  <!-- ==========================================
+       MODALS DO APP PRINCIPAL (CAIXAS, GUIA, ETC)
+       ========================================== -->
   <div id="modal-boxes" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/70 backdrop-blur-sm no-print transition-all">
     <div class="relative w-full max-w-4xl max-h-[90vh] rounded-xl shadow-2xl flex flex-col bg-white dark:bg-brand border border-zinc-200 dark:border-brand-light">
       <div class="flex items-center justify-between px-6 py-4 border-b border-zinc-200 dark:border-brand-light bg-slate-50 dark:bg-brand-darker rounded-t-xl">
@@ -161,26 +165,34 @@
             .dark .text-base-svg { fill: #cbd5e1; }
             .dark .stroke-main { stroke: #cbd5e1; }
           </style>
+          
           <text x="80" y="30" class="text-base-svg" text-anchor="middle">Barra de Terra</text>
           <text x="420" y="30" class="text-base-svg" text-anchor="middle">Bandeja / Leito</text>
+
           <rect x="50" y="60" width="60" height="140" class="stroke-main" stroke="#22c55e" fill="#f0fdf4"/>
           <line x1="50" y1="60" x2="110" y2="200" class="stroke-main" stroke="#22c55e"/>
           <line x1="110" y1="60" x2="50" y2="200" class="stroke-main" stroke="#22c55e"/>
+          
           <circle cx="80" cy="130" r="6" class="fill-highlight"/>
           <text x="45" y="134" font-size="12" font-weight="bold" fill="#64748b" text-anchor="end">E09 / E108</text>
+
           <line x1="390" y1="60" x2="390" y2="200" class="stroke-main"/>
           <line x1="450" y1="60" x2="450" y2="200" class="stroke-main"/>
           <line x1="390" y1="80" x2="450" y2="80" class="stroke-main"/>
           <line x1="390" y1="120" x2="450" y2="120" class="stroke-main"/>
           <line x1="390" y1="160" x2="450" y2="160" class="stroke-main"/>
+
           <circle cx="410" cy="80" r="5" class="fill-highlight"/>
           <circle cx="430" cy="80" r="5" class="fill-highlight"/>
           <line x1="410" y1="80" x2="430" y2="80" class="stroke-main" stroke="#22c55e" stroke-width="3"/>
           <text x="465" y="84" font-size="12" font-weight="bold" fill="#64748b" text-anchor="start">E08, E108</text>
+
           <circle cx="420" cy="120" r="6" class="fill-highlight"/>
           <text x="465" y="124" font-size="12" font-weight="bold" fill="#64748b" text-anchor="start">E09</text>
+          
           <polygon points="420,152 412,168 428,168" class="fill-stroke"/>
           <text x="465" y="164" font-size="12" font-weight="bold" fill="#64748b" text-anchor="start">E10</text>
+
           <path d="M100,130 C200,60 300,60 410,120" class="stroke-highlight" stroke-dasharray="4"/>
         </svg>
       </div>
@@ -196,73 +208,36 @@
         </button>
       </div>
       <div class="p-6 overflow-y-auto text-sm space-y-6 bg-slate-50 dark:bg-brand">
-        <!-- LEGENDA VISUAL -->
         <div class="flex flex-wrap items-center gap-6 p-4 bg-white dark:bg-[#0c141d] rounded-lg border border-zinc-200 dark:border-zinc-700 shadow-sm">
            <div class="text-xs font-black uppercase text-zinc-500">Simbologia Visual:</div>
-           
            <div class="flex items-center gap-2">
              <svg viewBox="0 0 40 20" class="w-8 h-4 stroke-emerald-600 dark:stroke-emerald-400 fill-emerald-600 dark:fill-emerald-400">
-                <line x1="0" y1="10" x2="40" y2="10" stroke-width="2"/>
-                <circle cx="15" cy="10" r="3.5"/><circle cx="25" cy="10" r="3.5"/>
-             </svg>
-             <span class="text-xs font-bold text-zinc-700 dark:text-zinc-200">E08, E108 (Pesinho)</span>
+                <line x1="0" y1="10" x2="40" y2="10" stroke-width="2"/><circle cx="15" cy="10" r="3.5"/><circle cx="25" cy="10" r="3.5"/>
+             </svg><span class="text-xs font-bold text-zinc-700 dark:text-zinc-200">E08, E108 (Pesinho)</span>
            </div>
-
            <div class="flex items-center gap-2">
              <svg viewBox="0 0 40 20" class="w-8 h-4 stroke-emerald-600 dark:stroke-emerald-400 fill-emerald-600 dark:fill-emerald-400">
-                <line x1="0" y1="10" x2="40" y2="10" stroke-width="2"/>
-                <circle cx="20" cy="10" r="4"/>
-             </svg>
-             <span class="text-xs font-bold text-zinc-700 dark:text-zinc-200">E09 (Bolinha)</span>
+                <line x1="0" y1="10" x2="40" y2="10" stroke-width="2"/><circle cx="20" cy="10" r="4"/>
+             </svg><span class="text-xs font-bold text-zinc-700 dark:text-zinc-200">E09 (Bolinha)</span>
            </div>
-
            <div class="flex items-center gap-2">
              <svg viewBox="0 0 40 20" class="w-8 h-4 stroke-emerald-600 dark:stroke-emerald-400 fill-emerald-600 dark:fill-emerald-400">
-                <line x1="0" y1="10" x2="40" y2="10" stroke-width="2"/>
-                <polygon points="20,4 14,15 26,15"/>
-             </svg>
-             <span class="text-xs font-bold text-zinc-700 dark:text-zinc-200">E10 (Triângulo)</span>
+                <line x1="0" y1="10" x2="40" y2="10" stroke-width="2"/><polygon points="20,4 14,15 26,15"/>
+             </svg><span class="text-xs font-bold text-zinc-700 dark:text-zinc-200">E10 (Triângulo)</span>
            </div>
         </div>
 
-        <!-- Tabelas da matriz -->
         <div>
           <h3 class="font-black text-brand dark:text-brand-accent uppercase mb-2">INDOOR CABLE LADDERS AND TRAYS</h3>
           <div class="overflow-x-auto rounded-lg border border-zinc-300 dark:border-zinc-700 shadow-sm">
             <table class="w-full text-left text-xs text-zinc-700 dark:text-zinc-200 bg-white dark:bg-[#0c141d]">
               <thead class="bg-slate-200 dark:bg-brand-darker uppercase font-black text-[10px] text-zinc-600 dark:text-zinc-400">
-                <tr>
-                  <th class="p-2 border-b border-r border-zinc-300 dark:border-zinc-700"></th>
-                  <th colspan="3" class="p-2 border-b border-r border-zinc-300 dark:border-zinc-700 text-center text-orange-600 dark:text-orange-500">ELECTRICAL (37)</th>
-                  <th colspan="3" class="p-2 border-b border-r border-zinc-300 dark:border-zinc-700 text-center text-blue-600 dark:text-blue-400">INSTRUMENT/ TELECOM (39)</th>
-                  <th colspan="3" class="p-2 border-b border-zinc-300 dark:border-zinc-700 text-center text-zinc-600 dark:text-zinc-300">LIGHTING (40)</th>
-                </tr>
-                <tr class="bg-slate-100 dark:bg-brand/50">
-                  <th class="p-2 border-b border-r border-zinc-300 dark:border-zinc-700"></th>
-                  <th class="p-2 border-b border-zinc-300 dark:border-zinc-700">TYPICAL</th>
-                  <th class="p-2 border-b border-zinc-300 dark:border-zinc-700">CABLE</th>
-                  <th class="p-2 border-b border-r border-zinc-300 dark:border-zinc-700">LUG</th>
-                  <th class="p-2 border-b border-zinc-300 dark:border-zinc-700">TYPICAL</th>
-                  <th class="p-2 border-b border-zinc-300 dark:border-zinc-700">CABLE</th>
-                  <th class="p-2 border-b border-r border-zinc-300 dark:border-zinc-700">LUG</th>
-                  <th class="p-2 border-b border-zinc-300 dark:border-zinc-700">TYPICAL</th>
-                  <th class="p-2 border-b border-zinc-300 dark:border-zinc-700">CABLE</th>
-                  <th class="p-2 border-b border-zinc-300 dark:border-zinc-700">LUG</th>
-                </tr>
+                <tr><th class="p-2 border-b border-r border-zinc-300 dark:border-zinc-700"></th><th colspan="3" class="p-2 border-b border-r border-zinc-300 dark:border-zinc-700 text-center text-orange-600 dark:text-orange-500">ELECTRICAL (37)</th><th colspan="3" class="p-2 border-b border-r border-zinc-300 dark:border-zinc-700 text-center text-blue-600 dark:text-blue-400">INSTRUMENT/ TELECOM (39)</th><th colspan="3" class="p-2 border-b border-zinc-300 dark:border-zinc-700 text-center text-zinc-600 dark:text-zinc-300">LIGHTING (40)</th></tr>
+                <tr class="bg-slate-100 dark:bg-brand/50"><th class="p-2 border-b border-r border-zinc-300 dark:border-zinc-700"></th><th class="p-2 border-b border-zinc-300 dark:border-zinc-700">TYPICAL</th><th class="p-2 border-b border-zinc-300 dark:border-zinc-700">CABLE</th><th class="p-2 border-b border-r border-zinc-300 dark:border-zinc-700">LUG</th><th class="p-2 border-b border-zinc-300 dark:border-zinc-700">TYPICAL</th><th class="p-2 border-b border-zinc-300 dark:border-zinc-700">CABLE</th><th class="p-2 border-b border-r border-zinc-300 dark:border-zinc-700">LUG</th><th class="p-2 border-b border-zinc-300 dark:border-zinc-700">TYPICAL</th><th class="p-2 border-b border-zinc-300 dark:border-zinc-700">CABLE</th><th class="p-2 border-b border-zinc-300 dark:border-zinc-700">LUG</th></tr>
               </thead>
               <tbody class="font-semibold">
-                <tr class="border-b border-zinc-200 dark:border-zinc-800 hover:bg-slate-50 dark:hover:bg-brand-light/10">
-                  <td class="p-2 border-r border-zinc-200 dark:border-zinc-800 font-black">LADDER (Height &ge; 100 mm)</td>
-                  <td class="p-2 text-blue-600 dark:text-blue-400">E 54A-D1</td><td class="p-2">-</td><td class="p-2 border-r border-zinc-200 dark:border-zinc-800 text-emerald-600 dark:text-emerald-400">E 08 - E108</td>
-                  <td class="p-2 text-blue-600 dark:text-blue-400">E 54B-D1</td><td class="p-2">-</td><td class="p-2 border-r border-zinc-200 dark:border-zinc-800 text-emerald-600 dark:text-emerald-400">E 09</td>
-                  <td class="p-2 text-blue-600 dark:text-blue-400">E 54C-D1</td><td class="p-2">-</td><td class="p-2 text-emerald-600 dark:text-emerald-400">E 09</td>
-                </tr>
-                <tr class="hover:bg-slate-50 dark:hover:bg-brand-light/10">
-                  <td class="p-2 border-r border-zinc-200 dark:border-zinc-800 font-black">TRAY (Height &lt; 100 mm)</td>
-                  <td class="p-2 text-blue-600 dark:text-blue-400">E 54A-D2</td><td class="p-2">-</td><td class="p-2 border-r border-zinc-200 dark:border-zinc-800 text-emerald-600 dark:text-emerald-400">E 08 - E108</td>
-                  <td class="p-2 text-blue-600 dark:text-blue-400">E 54B-D2</td><td class="p-2">-</td><td class="p-2 border-r border-zinc-200 dark:border-zinc-800 text-emerald-600 dark:text-emerald-400">E 10</td>
-                  <td class="p-2 text-blue-600 dark:text-blue-400">E 54C-D2</td><td class="p-2">-</td><td class="p-2 text-emerald-600 dark:text-emerald-400">E 10</td>
-                </tr>
+                <tr class="border-b border-zinc-200 dark:border-zinc-800 hover:bg-slate-50 dark:hover:bg-brand-light/10"><td class="p-2 border-r border-zinc-200 dark:border-zinc-800 font-black">LADDER (Height &ge; 100 mm)</td><td class="p-2 text-blue-600 dark:text-blue-400">E 54A-D1</td><td class="p-2">-</td><td class="p-2 border-r border-zinc-200 dark:border-zinc-800 text-emerald-600 dark:text-emerald-400">E 08 - E108</td><td class="p-2 text-blue-600 dark:text-blue-400">E 54B-D1</td><td class="p-2">-</td><td class="p-2 border-r border-zinc-200 dark:border-zinc-800 text-emerald-600 dark:text-emerald-400">E 09</td><td class="p-2 text-blue-600 dark:text-blue-400">E 54C-D1</td><td class="p-2">-</td><td class="p-2 text-emerald-600 dark:text-emerald-400">E 09</td></tr>
+                <tr class="hover:bg-slate-50 dark:hover:bg-brand-light/10"><td class="p-2 border-r border-zinc-200 dark:border-zinc-800 font-black">TRAY (Height &lt; 100 mm)</td><td class="p-2 text-blue-600 dark:text-blue-400">E 54A-D2</td><td class="p-2">-</td><td class="p-2 border-r border-zinc-200 dark:border-zinc-800 text-emerald-600 dark:text-emerald-400">E 08 - E108</td><td class="p-2 text-blue-600 dark:text-blue-400">E 54B-D2</td><td class="p-2">-</td><td class="p-2 border-r border-zinc-200 dark:border-zinc-800 text-emerald-600 dark:text-emerald-400">E 10</td><td class="p-2 text-blue-600 dark:text-blue-400">E 54C-D2</td><td class="p-2">-</td><td class="p-2 text-emerald-600 dark:text-emerald-400">E 10</td></tr>
               </tbody>
             </table>
           </div>
@@ -274,55 +249,25 @@
             <div class="overflow-x-auto rounded-lg border border-zinc-300 dark:border-zinc-700 shadow-sm">
               <table class="w-full text-left text-xs text-zinc-700 dark:text-zinc-200 bg-white dark:bg-[#0c141d]">
                 <thead class="bg-slate-200 dark:bg-brand-darker uppercase font-black text-[10px] text-zinc-600 dark:text-zinc-400">
-                  <tr>
-                    <th class="p-2 border-b border-r border-zinc-300 dark:border-zinc-700"></th>
-                    <th class="p-2 border-b border-zinc-300 dark:border-zinc-700">TYPICAL</th>
-                    <th class="p-2 border-b border-zinc-300 dark:border-zinc-700">CABLE</th>
-                    <th class="p-2 border-b border-zinc-300 dark:border-zinc-700">LUG *</th>
-                  </tr>
+                  <tr><th class="p-2 border-b border-r border-zinc-300 dark:border-zinc-700"></th><th class="p-2 border-b border-zinc-300 dark:border-zinc-700">TYPICAL</th><th class="p-2 border-b border-zinc-300 dark:border-zinc-700">CABLE</th><th class="p-2 border-b border-zinc-300 dark:border-zinc-700">LUG *</th></tr>
                 </thead>
                 <tbody class="font-semibold">
-                  <tr class="border-b border-zinc-200 dark:border-zinc-800 hover:bg-slate-50 dark:hover:bg-brand-light/10">
-                    <td class="p-2 border-r border-zinc-200 dark:border-zinc-800 font-black">LADDER</td>
-                    <td class="p-2 text-blue-600 dark:text-blue-400">E 55-D1</td><td class="p-2">N/A *</td><td class="p-2">N/A *</td>
-                  </tr>
-                  <tr class="border-b border-zinc-200 dark:border-zinc-800 hover:bg-slate-50 dark:hover:bg-brand-light/10">
-                    <td class="p-2 border-r border-zinc-200 dark:border-zinc-800 font-black">TRAY - HEIGHT 40mm - Every 600 mm - W/Cover</td>
-                    <td class="p-2 text-blue-600 dark:text-blue-400">E 55-D2</td><td class="p-2">N/A *</td><td class="p-2">N/A *</td>
-                  </tr>
-                  <tr class="border-b border-zinc-200 dark:border-zinc-800 hover:bg-slate-50 dark:hover:bg-brand-light/10">
-                    <td class="p-2 border-r border-zinc-200 dark:border-zinc-800 font-black">Derivation Cable</td>
-                    <td class="p-2 text-blue-600 dark:text-blue-400">E 55-D3</td><td class="p-2">-</td><td class="p-2 text-emerald-600 dark:text-emerald-400">E08</td>
-                  </tr>
-                  <tr class="border-b border-zinc-200 dark:border-zinc-800 hover:bg-slate-50 dark:hover:bg-brand-light/10">
-                    <td class="p-2 border-r border-zinc-200 dark:border-zinc-800 font-black">TRAY - HEIGHT 60mm - Every 600 mm</td>
-                    <td class="p-2 text-blue-600 dark:text-blue-400">E 55-D4</td><td class="p-2">N/A *</td><td class="p-2">N/A *</td>
-                  </tr>
-                  <tr class="border-b border-zinc-200 dark:border-zinc-800 hover:bg-slate-50 dark:hover:bg-brand-light/10">
-                    <td class="p-2 border-r border-zinc-200 dark:border-zinc-800 font-black">Bonded to Main Parallel Wire (Beginning - End)</td>
-                    <td class="p-2 text-blue-600 dark:text-blue-400">E 55-D5</td><td class="p-2">-</td><td class="p-2 text-emerald-600 dark:text-emerald-400">Item 225</td>
-                  </tr>
-                  <tr class="hover:bg-slate-50 dark:hover:bg-brand-light/10">
-                    <td class="p-2 border-r border-zinc-200 dark:border-zinc-800 font-black">TRAY - HEIGHT 40mm - Every 600 mm - W/OCover</td>
-                    <td class="p-2 text-blue-600 dark:text-blue-400">E 55-D6</td><td class="p-2">N/A *</td><td class="p-2">N/A *</td>
-                  </tr>
+                  <tr class="border-b border-zinc-200 dark:border-zinc-800 hover:bg-slate-50 dark:hover:bg-brand-light/10"><td class="p-2 border-r border-zinc-200 dark:border-zinc-800 font-black">LADDER</td><td class="p-2 text-blue-600 dark:text-blue-400">E 55-D1</td><td class="p-2">N/A *</td><td class="p-2">N/A *</td></tr>
+                  <tr class="border-b border-zinc-200 dark:border-zinc-800 hover:bg-slate-50 dark:hover:bg-brand-light/10"><td class="p-2 border-r border-zinc-200 dark:border-zinc-800 font-black">TRAY - HEIGHT 40mm - Every 600 mm - W/Cover</td><td class="p-2 text-blue-600 dark:text-blue-400">E 55-D2</td><td class="p-2">N/A *</td><td class="p-2">N/A *</td></tr>
+                  <tr class="border-b border-zinc-200 dark:border-zinc-800 hover:bg-slate-50 dark:hover:bg-brand-light/10"><td class="p-2 border-r border-zinc-200 dark:border-zinc-800 font-black">Derivation Cable</td><td class="p-2 text-blue-600 dark:text-blue-400">E 55-D3</td><td class="p-2">-</td><td class="p-2 text-emerald-600 dark:text-emerald-400">E08</td></tr>
+                  <tr class="border-b border-zinc-200 dark:border-zinc-800 hover:bg-slate-50 dark:hover:bg-brand-light/10"><td class="p-2 border-r border-zinc-200 dark:border-zinc-800 font-black">TRAY - HEIGHT 60mm - Every 600 mm</td><td class="p-2 text-blue-600 dark:text-blue-400">E 55-D4</td><td class="p-2">N/A *</td><td class="p-2">N/A *</td></tr>
+                  <tr class="border-b border-zinc-200 dark:border-zinc-800 hover:bg-slate-50 dark:hover:bg-brand-light/10"><td class="p-2 border-r border-zinc-200 dark:border-zinc-800 font-black">Bonded to Main Parallel Wire (Beginning - End)</td><td class="p-2 text-blue-600 dark:text-blue-400">E 55-D5</td><td class="p-2">-</td><td class="p-2 text-emerald-600 dark:text-emerald-400">Item 225</td></tr>
+                  <tr class="hover:bg-slate-50 dark:hover:bg-brand-light/10"><td class="p-2 border-r border-zinc-200 dark:border-zinc-800 font-black">TRAY - HEIGHT 40mm - Every 600 mm - W/OCover</td><td class="p-2 text-blue-600 dark:text-blue-400">E 55-D6</td><td class="p-2">N/A *</td><td class="p-2">N/A *</td></tr>
                 </tbody>
               </table>
             </div>
           </div>
-
           <div class="bg-indigo-50 dark:bg-indigo-950/30 p-4 rounded-xl border border-indigo-200 dark:border-indigo-800 text-xs text-indigo-900 dark:text-indigo-200 space-y-3">
              <h4 class="font-black uppercase tracking-widest border-b border-indigo-200 dark:border-indigo-800 pb-2">Notes</h4>
              <p><strong>* LUG in the columns here, refers to LUG applied on MCW.</strong></p>
              <p>To determine which LUG applies to Earthing Boss side, take in consideration cable diametres, but as a quick guide:</p>
-             <ul class="list-disc pl-5 font-mono font-bold text-[10px] space-y-1">
-               <li>E08 &rarr; E108 (120 mm²)</li>
-               <li>E09 &rarr; E09 (16 mm²)</li>
-               <li>E10 &rarr; E09 (16 mm²)</li>
-             </ul>
-             <p class="pt-2 border-t border-indigo-200 dark:border-indigo-800">
-               <strong>* N/A = Not Applicable.</strong> As per typical E 55, Detail 1, 2, 4 and 6 are supports/fixtures for main parallel wire, so refer mainly to Detail 5, or to Detail 3 (in case of derivation).
-             </p>
+             <ul class="list-disc pl-5 font-mono font-bold text-[10px] space-y-1"><li>E08 &rarr; E108 (120 mm²)</li><li>E09 &rarr; E09 (16 mm²)</li><li>E10 &rarr; E09 (16 mm²)</li></ul>
+             <p class="pt-2 border-t border-indigo-200 dark:border-indigo-800"><strong>* N/A = Not Applicable.</strong> As per typical E 55, Detail 1, 2, 4 and 6 are supports/fixtures for main parallel wire, so refer mainly to Detail 5, or to Detail 3 (in case of derivation).</p>
           </div>
         </div>
 
@@ -331,53 +276,282 @@
           <div class="overflow-x-auto rounded-lg border border-zinc-300 dark:border-zinc-700 shadow-sm">
             <table class="w-full text-left text-xs text-zinc-700 dark:text-zinc-200 bg-white dark:bg-[#0c141d]">
               <thead class="bg-slate-200 dark:bg-brand-darker uppercase font-black text-[10px] text-zinc-600 dark:text-zinc-400">
-                <tr>
-                  <th class="p-2 border-b border-r border-zinc-300 dark:border-zinc-700"></th>
-                  <th colspan="3" class="p-2 border-b border-r border-zinc-300 dark:border-zinc-700 text-center text-orange-600 dark:text-orange-500">ELECTRICAL (78)</th>
-                  <th colspan="3" class="p-2 border-b border-zinc-300 dark:border-zinc-700 text-center text-blue-600 dark:text-blue-400">I&C / TLC / LIGHTING (78)</th>
-                </tr>
-                <tr class="bg-slate-100 dark:bg-brand/50">
-                  <th class="p-2 border-b border-r border-zinc-300 dark:border-zinc-700"></th>
-                  <th class="p-2 border-b border-zinc-300 dark:border-zinc-700">TYPICAL</th>
-                  <th class="p-2 border-b border-zinc-300 dark:border-zinc-700">CABLE</th>
-                  <th class="p-2 border-b border-r border-zinc-300 dark:border-zinc-700">LUG</th>
-                  <th class="p-2 border-b border-zinc-300 dark:border-zinc-700">TYPICAL</th>
-                  <th class="p-2 border-b border-zinc-300 dark:border-zinc-700">CABLE</th>
-                  <th class="p-2 border-b border-zinc-300 dark:border-zinc-700">LUG</th>
-                </tr>
+                <tr><th class="p-2 border-b border-r border-zinc-300 dark:border-zinc-700"></th><th colspan="3" class="p-2 border-b border-r border-zinc-300 dark:border-zinc-700 text-center text-orange-600 dark:text-orange-500">ELECTRICAL (78)</th><th colspan="3" class="p-2 border-b border-zinc-300 dark:border-zinc-700 text-center text-blue-600 dark:text-blue-400">I&C / TLC / LIGHTING (78)</th></tr>
+                <tr class="bg-slate-100 dark:bg-brand/50"><th class="p-2 border-b border-r border-zinc-300 dark:border-zinc-700"></th><th class="p-2 border-b border-zinc-300 dark:border-zinc-700">TYPICAL</th><th class="p-2 border-b border-zinc-300 dark:border-zinc-700">CABLE</th><th class="p-2 border-b border-r border-zinc-300 dark:border-zinc-700">LUG</th><th class="p-2 border-b border-zinc-300 dark:border-zinc-700">TYPICAL</th><th class="p-2 border-b border-zinc-300 dark:border-zinc-700">CABLE</th><th class="p-2 border-b border-zinc-300 dark:border-zinc-700">LUG</th></tr>
               </thead>
               <tbody class="font-semibold">
-                <tr class="border-b border-zinc-200 dark:border-zinc-800 hover:bg-slate-50 dark:hover:bg-brand-light/10">
-                  <td class="p-2 border-r border-zinc-200 dark:border-zinc-800 font-black">LADDER (Height &ge; 100 mm)</td>
-                  <td class="p-2 text-blue-600 dark:text-blue-400">E 143-D1</td><td class="p-2">-</td><td class="p-2 border-r border-zinc-200 dark:border-zinc-800 text-emerald-600 dark:text-emerald-400">E108 (E08 SE E86 & CABO 120mm)</td>
-                  <td class="p-2 text-blue-600 dark:text-blue-400">E 143-D1</td><td class="p-2">-</td><td class="p-2 text-emerald-600 dark:text-emerald-400">E 09</td>
-                </tr>
-                <tr class="hover:bg-slate-50 dark:hover:bg-brand-light/10">
-                  <td class="p-2 border-r border-zinc-200 dark:border-zinc-800 font-black">TRAY (Height &lt; 100 mm)</td>
-                  <td class="p-2 text-blue-600 dark:text-blue-400">E 143-D2</td><td class="p-2">-</td><td class="p-2 border-r border-zinc-200 dark:border-zinc-800 text-emerald-600 dark:text-emerald-400">E108 (E08 SE E86 & CABO 120mm)</td>
-                  <td class="p-2 text-blue-600 dark:text-blue-400">E 143-D2</td><td class="p-2">-</td><td class="p-2 text-emerald-600 dark:text-emerald-400">E 10</td>
-                </tr>
+                <tr class="border-b border-zinc-200 dark:border-zinc-800 hover:bg-slate-50 dark:hover:bg-brand-light/10"><td class="p-2 border-r border-zinc-200 dark:border-zinc-800 font-black">LADDER (Height &ge; 100 mm)</td><td class="p-2 text-blue-600 dark:text-blue-400">E 143-D1</td><td class="p-2">-</td><td class="p-2 border-r border-zinc-200 dark:border-zinc-800 text-emerald-600 dark:text-emerald-400">E108 (E08 SE E86 & CABO 120mm)</td><td class="p-2 text-blue-600 dark:text-blue-400">E 143-D1</td><td class="p-2">-</td><td class="p-2 text-emerald-600 dark:text-emerald-400">E 09</td></tr>
+                <tr class="hover:bg-slate-50 dark:hover:bg-brand-light/10"><td class="p-2 border-r border-zinc-200 dark:border-zinc-800 font-black">TRAY (Height &lt; 100 mm)</td><td class="p-2 text-blue-600 dark:text-blue-400">E 143-D2</td><td class="p-2">-</td><td class="p-2 border-r border-zinc-200 dark:border-zinc-800 text-emerald-600 dark:text-emerald-400">E108 (E08 SE E86 & CABO 120mm)</td><td class="p-2 text-blue-600 dark:text-blue-400">E 143-D2</td><td class="p-2">-</td><td class="p-2 text-emerald-600 dark:text-emerald-400">E 10</td></tr>
               </tbody>
             </table>
           </div>
         </div>
-
       </div>
     </div>
   </div>
 
+  <!-- ==========================================
+       NOVO MODAL: SUB-APP DE KPIs & ANALYTICS
+       ========================================== -->
+  <div id="modal-kpi-app" class="fixed inset-0 z-50 hidden items-center justify-center p-4 sm:p-6 bg-brand-darker/80 backdrop-blur-sm no-print transition-all duration-300 opacity-0">
+    <div class="relative w-full max-w-6xl h-[95vh] rounded-2xl shadow-2xl flex flex-col bg-slate-50 dark:bg-brand-darker border border-zinc-200 dark:border-brand-light overflow-hidden transform scale-95 transition-transform duration-300" id="kpi-modal-content">
+        
+        <!-- Header KPI -->
+        <div class="flex items-center justify-between px-6 py-4 bg-white dark:bg-brand border-b border-zinc-200 dark:border-brand-light shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-rose-600 flex items-center justify-center text-white shadow-md">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                </div>
+                <div>
+                    <h2 class="text-lg font-black text-brand dark:text-white uppercase tracking-tight">Analytics & KPIs</h2>
+                    <p class="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">Mapeamento e Extração de Erros de Inspeção</p>
+                </div>
+            </div>
+            <button onclick="closeKpiApp()" class="p-2 rounded-lg transition-colors hover:bg-zinc-100 dark:hover:bg-brand-accent text-zinc-500 dark:text-zinc-300">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+        </div>
+
+        <!-- Abas Internas do KPI -->
+        <div class="flex border-b border-zinc-200 dark:border-brand-light bg-white dark:bg-brand px-6 shrink-0">
+            <button id="kpi-tab-btn-reg" onclick="switchKpiTab('reg')" class="px-5 py-4 text-xs font-black border-b-2 border-rose-600 text-rose-600 uppercase tracking-wider transition-colors">Registro de Erros da Sala</button>
+            <button id="kpi-tab-btn-dash" onclick="switchKpiTab('dash')" class="px-5 py-4 text-xs font-bold border-b-2 border-transparent text-zinc-500 dark:text-zinc-400 hover:text-brand dark:hover:text-white uppercase tracking-wider transition-colors">Dashboard Analítico & Exportação</button>
+        </div>
+
+        <!-- Scrollable Area -->
+        <div class="flex-1 overflow-y-auto p-6 relative">
+            
+            <!-- TAB: Registro de Erros -->
+            <div id="kpi-tab-reg" class="max-w-5xl mx-auto space-y-6 block">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5 p-5 bg-white dark:bg-brand border border-zinc-200 dark:border-brand-light rounded-xl shadow-sm">
+                    <div>
+                        <label class="block text-[10px] font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Semanas de Lançamento</label>
+                        <select id="kpi-week" class="w-full p-2.5 border border-zinc-200 dark:border-brand-light rounded-lg bg-slate-50 dark:bg-brand-darker text-xs font-bold text-zinc-800 dark:text-white outline-none focus:border-rose-500 transition-colors">
+                            <option value="Semana 1">Semana 1</option>
+                            <option value="Semana 2">Semana 2</option>
+                            <option value="Semana 3">Semana 3</option>
+                            <option value="Semana 4">Semana 4</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Sala Auditada <span class="text-rose-500">*</span></label>
+                        <input type="text" id="kpi-room" placeholder="Ex: DC653" class="w-full p-2.5 border border-zinc-200 dark:border-brand-light rounded-lg bg-slate-50 dark:bg-brand-darker text-xs font-bold text-zinc-800 dark:text-white uppercase outline-none focus:border-rose-500 transition-colors">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Total de Folhas do PDF</label>
+                        <input type="number" id="kpi-sheets" placeholder="Opcional" min="1" class="w-full p-2.5 border border-zinc-200 dark:border-brand-light rounded-lg bg-slate-50 dark:bg-brand-darker text-xs font-bold text-zinc-800 dark:text-white outline-none focus:border-rose-500 transition-colors">
+                    </div>
+                </div>
+
+                <div class="bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900 p-4 rounded-xl text-xs text-rose-800 dark:text-rose-300 font-bold flex gap-3 shadow-sm">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <span>MÓDULO DE ERROS: Aqui você deve marcar APENAS os itens da lista abaixo que apresentaram falhas na sala avaliada. O restante fica em branco.</span>
+                </div>
+
+                <!-- Lista COMPLETA (20 Itens Numéricos) injetada dinamicamente -->
+                <div id="kpi-form-checklist" class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4"></div>
+
+                <!-- Botão de Registro Ajustado para não flutuar por cima da lista -->
+                <div class="mt-6 pt-4 border-t border-zinc-200 dark:border-brand-light flex justify-end">
+                    <button onclick="saveKpiRecord()" class="bg-rose-600 hover:bg-rose-700 text-white px-8 py-3 rounded-lg font-black shadow-lg transition-all transform hover:-translate-y-0.5 flex items-center gap-2 text-sm uppercase tracking-wider">
+                        Registrar Erros da Sala
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- TAB: Dashboard Analítico -->
+            <div id="kpi-tab-dash" class="max-w-5xl mx-auto space-y-6 hidden">
+                
+                <!-- Cards de Estatísticas -->
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="bg-white dark:bg-brand p-5 rounded-xl border border-zinc-200 dark:border-brand-light flex flex-col items-center shadow-sm">
+                        <span class="text-[10px] font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Salas Inspecionadas</span>
+                        <span id="kpi-stat-rooms" class="text-4xl font-black text-brand dark:text-white mt-2 tracking-tighter">0</span>
+                    </div>
+                    <div class="bg-white dark:bg-brand p-5 rounded-xl border border-zinc-200 dark:border-brand-light flex flex-col items-center shadow-sm">
+                        <span class="text-[10px] font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Total de Erros</span>
+                        <span id="kpi-stat-errors" class="text-4xl font-black text-rose-600 mt-2 tracking-tighter">0</span>
+                    </div>
+                    <div class="bg-white dark:bg-brand p-5 rounded-xl border border-zinc-200 dark:border-brand-light flex flex-col items-center shadow-sm">
+                        <span class="text-[10px] font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Média Erro/Sala</span>
+                        <span id="kpi-stat-avg" class="text-4xl font-black text-amber-500 mt-2 tracking-tighter">0.0</span>
+                    </div>
+                </div>
+
+                <!-- Filtro de Semanas e Exportação -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white dark:bg-brand p-5 rounded-xl border border-zinc-200 dark:border-brand-light shadow-sm gap-4">
+                    <div class="flex items-center gap-3 w-full sm:w-auto">
+                        <label class="text-[10px] font-black text-brand dark:text-white uppercase tracking-wider shrink-0">Filtrar Visão:</label>
+                        <select id="kpi-filter-week" onchange="renderKpiDashboard()" class="w-full sm:w-auto p-2 border border-zinc-200 dark:border-brand-light rounded-lg bg-slate-50 dark:bg-brand-darker text-xs font-bold text-zinc-800 dark:text-white outline-none focus:border-brand-accent transition-colors">
+                            <option value="ALL">Todas as Semanas (Histórico)</option>
+                            <option value="Semana 1">Semana 1</option>
+                            <option value="Semana 2">Semana 2</option>
+                            <option value="Semana 3">Semana 3</option>
+                            <option value="Semana 4">Semana 4</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2 w-full sm:w-auto">
+                        <button onclick="clearKpiMemory()" class="w-full sm:w-auto bg-rose-100 text-rose-700 px-5 py-2.5 rounded-lg font-black shadow-md hover:bg-rose-200 transition-all flex justify-center items-center gap-2 text-xs uppercase tracking-wider">
+                            🗑️ Limpar Memória (KPI)
+                        </button>
+                        <button onclick="exportKpiCSV()" class="w-full sm:w-auto bg-[#107c41] text-white px-5 py-2.5 rounded-lg font-black shadow-md hover:bg-[#0c5d31] transition-all flex justify-center items-center gap-2 text-xs uppercase tracking-wider">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            Exportar Base
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Gráfico de Colunas Vertical (Estilo Excel) com Chart.js -->
+                <div class="bg-white dark:bg-brand p-6 rounded-xl border border-zinc-200 dark:border-brand-light shadow-sm">
+                    <div class="w-full h-[400px]">
+                        <canvas id="kpiChartCanvas"></canvas>
+                    </div>
+                </div>
+
+                <!-- NOVA JANELA: Memória de Salas Registradas -->
+                <div class="bg-white dark:bg-brand p-5 rounded-xl border border-zinc-200 dark:border-brand-light shadow-sm">
+                    <h3 class="text-sm font-black text-brand dark:text-white mb-4 uppercase tracking-wider flex items-center gap-2">
+                        <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Salas na Memória (Filtro Atual)
+                    </h3>
+                    <div class="overflow-x-auto border border-zinc-200 dark:border-brand-light rounded-lg">
+                        <table class="w-full text-left text-xs text-zinc-700 dark:text-zinc-200">
+                            <thead class="bg-slate-100 dark:bg-brand-darker uppercase text-[10px] text-zinc-500 font-bold">
+                                <tr>
+                                    <th class="p-3 border-b border-zinc-200 dark:border-brand-light">Semana</th>
+                                    <th class="p-3 border-b border-zinc-200 dark:border-brand-light">Sala</th>
+                                    <th class="p-3 border-b border-zinc-200 dark:border-brand-light text-center">Folhas</th>
+                                    <th class="p-3 border-b border-zinc-200 dark:border-brand-light text-center">Erros Constatados</th>
+                                    <th class="p-3 border-b border-zinc-200 dark:border-brand-light text-center">Ação</th>
+                                </tr>
+                            </thead>
+                            <tbody id="kpi-memory-table" class="font-medium">
+                                <!-- Preenchido dinamicamente via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
   <script>
-    // Configurações e Bases de Dados
+    // -------------------------------------------------------------
+    // DADOS NATIVOS DA APLICAÇÃO (Matriz Atualizada: 1 ao 20)
+    // -------------------------------------------------------------
+    
+    // Matriz Atualizada para mostrar os números exatos (1 ao 20) para bater perfeitamente com o Gráfico e com a Auditoria
+    const CHECKLIST_DATA = [
+      {
+        category: "Verificações do Carimbo (Selo)",
+        items: [
+          { id: "chk1", text: "1. Data de emissão atualizada?", tag: "Data" },
+          { id: "chk2", text: "2. Nomes do contratante corretos (M. Puis...)?", tag: "Nomes" },
+          { id: "chk3", text: "3. Número total de folhas correto?", tag: "Folhas" },
+          { id: "chk4", text: "4. Nome da folha, DMS e Employer de acordo com a MDL?", tagImportant: "CRÍTICO" },
+          { id: "chk5", text: "5. Final do Employer ID alterado para 584xXXX?", tagImportant: "IMPORTANTE" },
+          { id: "chk11", text: "6. Verificação de carimbo - Numero de folhas e escalas..." },
+          { id: "chk12", text: "7. Titulo do desenho corresponde ao nome do carimbo..." },
+          { id: "chk13", text: "8. Alinhamento do textos no carimbo..." }
+        ]
+      },
+      {
+        category: "Verificações de Desenho e Layout",
+        items: [
+          { id: "chk6", text: "9. Nivel e Norte corretos?", tagImportant: "CRÍTICO" },
+          { id: "chk7", text: "10. Escala geral (carimbo) e escalas dos elementos...", tag: "Escala" },
+          { id: "chk8", text: "11. Numeração dos cortes sequencial e correta...", tag: "Cortes" },
+          { id: "chk9", text: "12. Viewports desativadas (trancadas)?", tag: "Viewport" },
+          { id: "chk10", text: "13. Arquivo salvo com a visualização no Layout...", tag: "Finalização" },
+          { id: "chk14", text: "14. Verificar se o desenho não foi cortado pela viewport" },
+          { id: "chk15", text: "15. Verificar numeração da linha corte e Cortes..." },
+          { id: "chk16", text: "16. Foi verificado a correspondencia do Keyplant com a sala..." },
+          { id: "chk17", text: "17. A tabela está com a 3,5mm na viewport?..." }
+        ]
+      },
+      {
+        category: "Cover Sheet, Tabelas e Quantitativos",
+        items: [
+          { id: "chk18", text: "18. Alinhamentos dos símbolos na tabela estão centralizados..." },
+          { id: "chk19", text: "19. Cover sheet corresponde a numeração e quantidade..." },
+          { id: "chk20", text: "20. Contagem de elementos feitos e verificados?" }
+        ]
+      }
+    ];
+
+    const DB_HVAC = [
+      { material: 'Aço Carbono', geometry: 'Retangular', insulated: 'Sem Isolamento', typicalJumper: 'E51A-D1', typicalGround: 'E51A-D2' },
+      { material: 'Aço Carbono', geometry: 'Retangular', insulated: 'Com Isolamento', typicalJumper: 'E51B-D1', typicalGround: 'E51B-D2' },
+      { material: 'Aço Carbono', geometry: 'Circular', insulated: 'Sem Isolamento', typicalJumper: 'E51C-D1', typicalGround: 'E51C-D2' },
+      { material: 'Aço Carbono', geometry: 'Circular', insulated: 'Com Isolamento', typicalJumper: 'E51C-D1', typicalGround: 'E51C-D2' },
+      { material: 'Aço Inoxidável', geometry: 'Retangular', insulated: 'Sem Isolamento', typicalJumper: 'E53A-D1', typicalGround: 'E53A-D2' },
+      { material: 'Aço Inoxidável', geometry: 'Retangular', insulated: 'Com Isolamento', typicalJumper: 'E53B-D1', typicalGround: 'E53B-D2' },
+      { material: 'Aço Inoxidável', geometry: 'Circular', insulated: 'Sem Isolamento', typicalJumper: 'E53C-D1', typicalGround: 'E52C' },
+      { material: 'Aço Inoxidável', geometry: 'Circular', insulated: 'Com Isolamento', typicalJumper: 'E115A-D2', typicalGround: 'E115A-D1' },
+      { material: 'Aço Galvanizado', geometry: 'Retangular', insulated: 'Sem Isolamento', typicalJumper: 'E52A-D1/D4', typicalGround: 'E52A-D2' },
+      { material: 'Aço Galvanizado', geometry: 'Retangular', insulated: 'Com Isolamento', typicalJumper: 'E52B-D3', typicalGround: 'E52B-D2' },
+      { material: 'Aço Galvanizado', geometry: 'Circular', insulated: 'Sem Isolamento', typicalJumper: 'E53C-D1', typicalGround: 'E52D' },
+      { material: 'Aço Galvanizado', geometry: 'Circular', insulated: 'Com Isolamento', typicalJumper: 'E115B-D2', typicalGround: 'E115B-D1' },
+      { material: 'Equipamento', geometry: 'Retangular', insulated: 'Sem Isolamento', typicalJumper: 'E53D', typicalGround: 'E53D' },
+      { material: 'Equipamento', geometry: 'Circular', insulated: 'Sem Isolamento', typicalJumper: 'E53D', typicalGround: 'E53D' }
+    ];
+
+    const DB_PIPING = [
+      { material: 'Aço Carbono', geometry: 'Circular', insulated: 'Sem Isolamento', typicalJumper: 'E57/E58-D2', typicalGround: 'E57/E58-D1' },
+      { material: 'Aço Inoxidável', geometry: 'Circular', insulated: 'Sem Isolamento', typicalJumper: 'E57/E58-D2', typicalGround: 'E57/E58-D1' },
+      { material: 'Aço Inoxidável', geometry: 'Circular', insulated: 'Com Isolamento', typicalJumper: 'E59A', typicalGround: 'E59A' },
+      { material: 'Cobre', geometry: 'Circular', insulated: 'Sem Isolamento', typicalJumper: 'E58-D2', typicalGround: 'E58-D1' },
+      { material: 'Cobre', geometry: 'Circular', insulated: 'Com Isolamento', typicalJumper: 'E59B', typicalGround: 'E59B' },
+      { material: 'Aço Galvanizado', geometry: 'Circular', insulated: 'Sem Isolamento', typicalJumper: 'E58-D2', typicalGround: 'E58-D1' },
+      { material: 'Aço Galvanizado', geometry: 'Circular', insulated: 'Com Isolamento', typicalJumper: 'E59C', typicalGround: 'E59C' }
+    ];
+
+    const DB_TRAYS = {
+      Electrical: {
+        Ladder: { typical: "E 54A-D1", lug: "E 08 / E 108", boss: "E 22" },
+        Tray: { typical: "E 54A-D2", lug: "E 08 / E 108", boss: "E 22" }
+      },
+      Instrumental: {
+        Ladder: { typical: "E 54B-D1", lug: "E 09", boss: "E 22" },
+        Tray: { typical: "E 54B-D2", lug: "E 10", boss: "E 32B" }
+      },
+      Lighting: {
+        Ladder: { typical: "E 54C-D1", lug: "E 09", boss: "E 22" },
+        Tray: { typical: "E 54C-D2", lug: "E 10", boss: "E 22" }
+      }
+    };
+
     const EARTHING_BOXES = [
-      { id: 'E22²', page: '14', dwg: '120033-012', desc: 'EARTHING COPPER BAR 300X40 mm EARTHING STAINLESS STEEL BAR 300x50 mm', svg: `<svg viewBox="0 0 40 20" class="w-10 h-5 stroke-current fill-none" stroke-width="1.5"><rect x="2" y="2" width="36" height="16"/><line x1="2" y1="2" x2="38" y2="18"/><line x1="38" y1="2" x2="2" y2="18"/></svg>` },
-      { id: 'E23³', page: '15', dwg: '120033-013', desc: 'L70x70x7 mm FOR 1 COMPRESSION CABLE LUG FOR WALL WITH INSULATION', svg: `<svg viewBox="0 0 40 20" class="w-10 h-5 stroke-current fill-none" stroke-width="1.5"><rect x="2" y="2" width="36" height="16"/><line x1="2" y1="2" x2="38" y2="18"/><line x1="38" y1="2" x2="2" y2="18"/><polygon points="2,2 20,10 2,18" class="fill-current"/></svg>` },
-      { id: 'E15', page: '12', dwg: '120033-010', desc: 'EARTHING COPPER BAR 300X40 mm EARTHING STAINLESS STEEL BAR 300x50 mm', svg: `<svg viewBox="0 0 24 24" class="w-6 h-6 stroke-current fill-none" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>` },
-      { id: 'E32', page: '18', dwg: '120033-016', desc: 'EARTHING COPPER BAR 300X40 mm FOR WALLS WITH INSULATION', svg: `<svg viewBox="0 0 40 24" class="w-10 h-6 stroke-current fill-none" stroke-width="1.5"><line x1="2" y1="2" x2="38" y2="2" stroke-dasharray="2 2"/><rect x="6" y="6" width="28" height="8"/><line x1="6" y1="6" x2="34" y2="14"/><line x1="34" y1="6" x2="6" y2="14"/><polyline points="16,14 16,20 10,20"/></svg>` },
-      { id: 'E30', page: '18', dwg: '120033-016', desc: 'L70x70x7 mm FOR 1 COMPRESSION CABLE LUG FOR WALL WITH INSULATION', svg: `<svg viewBox="0 0 20 40" class="w-4 h-8 stroke-current fill-none" stroke-width="1.5"><rect x="2" y="2" width="16" height="36"/><circle cx="10" cy="30" r="2"/></svg>` },
-      { id: 'E31 ( 4 furos)', page: '67', dwg: '120033-065', desc: 'L70x70x7 mm FOR 1 COMPRESSION CABLE LUG (4HOLES) FOR WALL WITH INSULATION', svg: `<svg viewBox="0 0 40 20" class="w-10 h-5 stroke-current fill-none" stroke-width="1.5"><rect x="2" y="2" width="36" height="16"/><circle cx="8" cy="10" r="1.5"/><circle cx="16" cy="10" r="1.5"/><circle cx="24" cy="10" r="1.5"/><circle cx="32" cy="10" r="1.5"/></svg>` },
-      { id: 'E31 ( 2 furos)', page: '67', dwg: '120033-065', desc: 'L70x70x7 mm FOR 1 COMPRESSION CABLE LUG (2 HOLES) FOR WALL WITH INSULATION', svg: `<svg viewBox="0 0 20 40" class="w-4 h-8 stroke-current fill-none" stroke-width="1.5"><rect x="2" y="2" width="16" height="36"/><circle cx="10" cy="12" r="2"/><circle cx="10" cy="28" r="2"/></svg>` },
-      { id: 'E38', page: '22', dwg: '120033-020', desc: 'L70x70x7 mm FOR 1 COMPRESSION CABLE LUG FOR WALL WITH INSULATION', svg: `<svg viewBox="0 0 40 20" class="w-10 h-5 stroke-current fill-none" stroke-width="1.5"><polyline points="2,16 2,10 10,10 10,4 30,4 30,10 38,10 38,16"/><rect x="2" y="10" width="8" height="6"/><line x1="2" y1="10" x2="10" y2="16"/><line x1="10" y1="10" x2="2" y2="16"/><rect x="30" y="10" width="8" height="6"/><line x1="30" y1="10" x2="38" y2="16"/><line x1="38" y1="10" x2="30" y2="16"/></svg>` },
-      { id: 'E96', displayName: 'E96 (4) <br><span class="text-rose-500 font-bold tracking-tight text-[9px]">(APENAS SALAS GIS de 66 kV 1/2)</span>', page: '15', dwg: '120033-013', desc: 'EARTHING COPPER BAR 300X40 mm EARTHING STAINLESS STEEL BAR 300x50 mm', svg: `<svg viewBox="0 0 40 20" class="w-10 h-5 stroke-current fill-none" stroke-width="1.5"><rect x="2" y="2" width="36" height="16"/><line x1="2" y1="2" x2="38" y2="18"/><line x1="38" y1="2" x2="2" y2="18"/></svg>` }
+      { id: 'E22²', page: '14', dwg: '120033-012', desc: 'EARTHING COPPER BAR 300X40 mm EARTHING STAINLESS STEEL BAR 300x50 mm',
+        svg: `<svg viewBox="0 0 40 20" class="w-10 h-5 stroke-current fill-none" stroke-width="1.5"><rect x="2" y="2" width="36" height="16"/><line x1="2" y1="2" x2="38" y2="18"/><line x1="38" y1="2" x2="2" y2="18"/></svg>`
+      },
+      { id: 'E23³', page: '15', dwg: '120033-013', desc: 'L70x70x7 mm FOR 1 COMPRESSION CABLE LUG FOR WALL WITH INSULATION',
+        svg: `<svg viewBox="0 0 40 20" class="w-10 h-5 stroke-current fill-none" stroke-width="1.5"><rect x="2" y="2" width="36" height="16"/><line x1="2" y1="2" x2="38" y2="18"/><line x1="38" y1="2" x2="2" y2="18"/><polygon points="2,2 20,10 2,18" class="fill-current"/></svg>`
+      },
+      { id: 'E15', page: '12', dwg: '120033-010', desc: 'EARTHING COPPER BAR 300X40 mm EARTHING STAINLESS STEEL BAR 300x50 mm',
+        svg: `<svg viewBox="0 0 24 24" class="w-6 h-6 stroke-current fill-none" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>`
+      },
+      { id: 'E32', page: '18', dwg: '120033-016', desc: 'EARTHING COPPER BAR 300X40 mm FOR WALLS WITH INSULATION',
+        svg: `<svg viewBox="0 0 40 24" class="w-10 h-6 stroke-current fill-none" stroke-width="1.5"><line x1="2" y1="2" x2="38" y2="2" stroke-dasharray="2 2"/><rect x="6" y="6" width="28" height="8"/><line x1="6" y1="6" x2="34" y2="14"/><line x1="34" y1="6" x2="6" y2="14"/><polyline points="16,14 16,20 10,20"/></svg>`
+      },
+      { id: 'E30', page: '18', dwg: '120033-016', desc: 'L70x70x7 mm FOR 1 COMPRESSION CABLE LUG FOR WALL WITH INSULATION',
+        svg: `<svg viewBox="0 0 20 40" class="w-4 h-8 stroke-current fill-none" stroke-width="1.5"><rect x="2" y="2" width="16" height="36"/><circle cx="10" cy="30" r="2"/></svg>`
+      },
+      { id: 'E31 ( 4 furos)', page: '67', dwg: '120033-065', desc: 'L70x70x7 mm FOR 1 COMPRESSION CABLE LUG (4HOLES) FOR WALL WITH INSULATION',
+        svg: `<svg viewBox="0 0 40 20" class="w-10 h-5 stroke-current fill-none" stroke-width="1.5"><rect x="2" y="2" width="36" height="16"/><circle cx="8" cy="10" r="1.5"/><circle cx="16" cy="10" r="1.5"/><circle cx="24" cy="10" r="1.5"/><circle cx="32" cy="10" r="1.5"/></svg>`
+      },
+      { id: 'E31 ( 2 furos)', page: '67', dwg: '120033-065', desc: 'L70x70x7 mm FOR 1 COMPRESSION CABLE LUG (2 HOLES) FOR WALL WITH INSULATION',
+        svg: `<svg viewBox="0 0 20 40" class="w-4 h-8 stroke-current fill-none" stroke-width="1.5"><rect x="2" y="2" width="16" height="36"/><circle cx="10" cy="12" r="2"/><circle cx="10" cy="28" r="2"/></svg>`
+      },
+      { id: 'E38', page: '22', dwg: '120033-020', desc: 'L70x70x7 mm FOR 1 COMPRESSION CABLE LUG FOR WALL WITH INSULATION',
+        svg: `<svg viewBox="0 0 40 20" class="w-10 h-5 stroke-current fill-none" stroke-width="1.5"><polyline points="2,16 2,10 10,10 10,4 30,4 30,10 38,10 38,16"/><rect x="2" y="10" width="8" height="6"/><line x1="2" y1="10" x2="10" y2="16"/><line x1="10" y1="10" x2="2" y2="16"/><rect x="30" y="10" width="8" height="6"/><line x1="30" y1="10" x2="38" y2="16"/><line x1="38" y1="10" x2="30" y2="16"/></svg>`
+      },
+      { id: 'E96', displayName: 'E96 (4) <br><span class="text-rose-500 font-bold tracking-tight text-[9px]">(APENAS SALAS GIS de 66 kV 1/2)</span>', page: '15', dwg: '120033-013', desc: 'EARTHING COPPER BAR 300X40 mm EARTHING STAINLESS STEEL BAR 300x50 mm',
+        svg: `<svg viewBox="0 0 40 20" class="w-10 h-5 stroke-current fill-none" stroke-width="1.5"><rect x="2" y="2" width="36" height="16"/><line x1="2" y1="2" x2="38" y2="18"/><line x1="38" y1="2" x2="2" y2="18"/></svg>`
+      }
     ];
 
     const state = {
@@ -387,11 +561,13 @@
       sheetName: 'Layout_001',
       roomName: '',
       authorName: '',
+      
       hvacScope: 'hvac',
       hvacMaterial: 'Aço Carbono',
       hvacGeom: 'Retangular',
       hvacIso: 'Sem Isolamento',
       hvacConn: 'jumper',
+      
       trayEnv: 'Indoor', 
       trayDisc: 'Electrical',
       trayType: 'Ladder',
@@ -400,56 +576,29 @@
       specialType: 'cab_16',  
       trayE86Modeled: true,
       trayE86Role: 'normal', 
+      
       dmsInput: '584420',
       tagInput: '#BAL.BA11=751&LD041-000543'
     };
 
-    const CHECKLIST_DATA = [
-      {
-        category: "Verificações do Carimbo (Selo)",
-        items: [
-          { id: "chk1", text: "Data de emissão atualizada?", tag: "Data" },
-          { id: "chk2", text: "Nomes do contratante corretos (M. Puis, F. Peláez, S. Rodrigues)?", tag: "Nomes" },
-          { id: "chk3", text: "Número total de folhas correto?", tag: "Folhas" },
-          { id: "chk4", text: "Nome da folha, DMS e Employer de acordo com a MDL?", tagImportant: "CRÍTICO" },
-          { id: "chk5", text: "Final do Employer ID alterado para 584xXXX? (⚠️ APENAS HVAC)", tagImportant: "IMPORTANTE" },
-          { id: "chk11", text: "Verificação de carimbo - Numero de folhas e escalas foram preenchidos?" },
-          { id: "chk12", text: "Titulo do desenho oorresponde ao nome do carimbo?" },
-          { id: "chk13", text: "Alinhamento do textos no carimbo (Project, Document Type)" }
-        ]
-      },
-      {
-        category: "Verificações de Desenho e Layout",
-        items: [
-          { id: "chk6", text: "Nível e Norte corretos?", tagImportant: "CRÍTICO" },
-          { id: "chk7", text: "Escala geral (carimbo) e escalas dos elementos coerentes visíveis?", tag: "Escala" },
-          { id: "chk8", text: "Numeração dos cortes sequencial e correta em múltiplas folhas?", tag: "Cortes" },
-          { id: "chk9", text: "Viewports desativadas (trancadas)?", tag: "Viewport" },
-          { id: "chk10", text: "Arquivo salvo com a visualização no Layout (Paper Space)?", tag: "Finalização" },
-          { id: "chk14", text: "Verificar se o desenho não foi cortado pela viewport" },
-          { id: "chk15", text: "Verificar numeração da linha corte e Cortes de acordo com a pagina" },
-          { id: "chk16", text: "Foi verificado a correspondencia do Keyplant com a sala em questão?" },
-          { id: "chk17", text: "A tabela está com a 3,5mm na viewport? Todas as fontes em Arrial Narrow?" }
-        ]
-      },
-      {
-        category: "Cover Sheet, Tabelas e Quantitativos",
-        items: [
-          { id: "chk18", text: "Alinhamentos dos símbolos na tabela estão centralizados? (Earthing box/lugs)" },
-          { id: "chk19", text: "Cover sheet corresponde a numeração e quantidade com as folhas realizadas?" },
-          { id: "chk20", text: "Contagem de elementos feitos e verificados?" }
-        ]
-      }
-    ];
+    // Variavel de Memória Local para o Sub-App KPI
+    let kpiDataEngine = JSON.parse(localStorage.getItem('CQ_KPI_Data_Engine')) || [];
+    let kpiChartInstance = null; // Guarda a instancia do Chart.js
 
-    const DB_HVAC = [ { material: 'Aço Carbono', geometry: 'Retangular', insulated: 'Sem Isolamento', typicalJumper: 'E51A-D1', typicalGround: 'E51A-D2' }, { material: 'Aço Carbono', geometry: 'Retangular', insulated: 'Com Isolamento', typicalJumper: 'E51B-D1', typicalGround: 'E51B-D2' }, { material: 'Aço Carbono', geometry: 'Circular', insulated: 'Sem Isolamento', typicalJumper: 'E51C-D1', typicalGround: 'E51C-D2' }, { material: 'Aço Carbono', geometry: 'Circular', insulated: 'Com Isolamento', typicalJumper: 'E51C-D1', typicalGround: 'E51C-D2' }, { material: 'Aço Inoxidável', geometry: 'Retangular', insulated: 'Sem Isolamento', typicalJumper: 'E53A-D1', typicalGround: 'E53A-D2' }, { material: 'Aço Inoxidável', geometry: 'Retangular', insulated: 'Com Isolamento', typicalJumper: 'E53B-D1', typicalGround: 'E53B-D2' }, { material: 'Aço Inoxidável', geometry: 'Circular', insulated: 'Sem Isolamento', typicalJumper: 'E53C-D1', typicalGround: 'E52C' }, { material: 'Aço Inoxidável', geometry: 'Circular', insulated: 'Com Isolamento', typicalJumper: 'E115A-D2', typicalGround: 'E115A-D1' }, { material: 'Aço Galvanizado', geometry: 'Retangular', insulated: 'Sem Isolamento', typicalJumper: 'E52A-D1/D4', typicalGround: 'E52A-D2' }, { material: 'Aço Galvanizado', geometry: 'Retangular', insulated: 'Com Isolamento', typicalJumper: 'E52B-D3', typicalGround: 'E52B-D2' }, { material: 'Aço Galvanizado', geometry: 'Circular', insulated: 'Sem Isolamento', typicalJumper: 'E53C-D1', typicalGround: 'E52D' }, { material: 'Aço Galvanizado', geometry: 'Circular', insulated: 'Com Isolamento', typicalJumper: 'E115B-D2', typicalGround: 'E115B-D1' }, { material: 'Equipamento', geometry: 'Retangular', insulated: 'Sem Isolamento', typicalJumper: 'E53D', typicalGround: 'E53D' }, { material: 'Equipamento', geometry: 'Circular', insulated: 'Sem Isolamento', typicalJumper: 'E53D', typicalGround: 'E53D' } ];
-    const DB_PIPING = [ { material: 'Aço Carbono', geometry: 'Circular', insulated: 'Sem Isolamento', typicalJumper: 'E57/E58-D2', typicalGround: 'E57/E58-D1' }, { material: 'Aço Inoxidável', geometry: 'Circular', insulated: 'Sem Isolamento', typicalJumper: 'E57/E58-D2', typicalGround: 'E57/E58-D1' }, { material: 'Aço Inoxidável', geometry: 'Circular', insulated: 'Com Isolamento', typicalJumper: 'E59A', typicalGround: 'E59A' }, { material: 'Cobre', geometry: 'Circular', insulated: 'Sem Isolamento', typicalJumper: 'E58-D2', typicalGround: 'E58-D1' }, { material: 'Cobre', geometry: 'Circular', insulated: 'Com Isolamento', typicalJumper: 'E59B', typicalGround: 'E59B' }, { material: 'Aço Galvanizado', geometry: 'Circular', insulated: 'Sem Isolamento', typicalJumper: 'E58-D2', typicalGround: 'E58-D1' }, { material: 'Aço Galvanizado', geometry: 'Circular', insulated: 'Com Isolamento', typicalJumper: 'E59C', typicalGround: 'E59C' } ];
-    const DB_TRAYS = { Electrical: { Ladder: { typical: "E 54A-D1", lug: "E 08 / E 108", boss: "E 22" }, Tray: { typical: "E 54A-D2", lug: "E 08 / E 108", boss: "E 22" } }, Instrumental: { Ladder: { typical: "E 54B-D1", lug: "E 09", boss: "E 22" }, Tray: { typical: "E 54B-D2", lug: "E 10", boss: "E 32B" } }, Lighting: { Ladder: { typical: "E 54C-D1", lug: "E 09", boss: "E 22" }, Tray: { typical: "E 54C-D2", lug: "E 10", boss: "E 22" } } };
+    // [!!!] URL DE WEBHOOK (FORMSPREE, MAKE, N8N, APPS SCRIPT) PARA FUNCIONAR COMO FORMS NO GITHUB PAGES [!!!]
+    const CLOUD_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzQEf_YuItBkLcKCjXmXBPRSLWaay5-9ImngJWctdzPmqns35W3iU_bFcKlFanUTlHwJw/exec"; 
 
-    // --- FUNÇÕES GLOBAIS ---
+    // -------------------------------------------------------------
+    // LOGICA PRINCIPAL DA APLICAÇÃO (UI, Modals e HVAC/Trays)
+    // -------------------------------------------------------------
+
     function initApp() {
-      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) { state.darkMode = true; toggleDarkMode(true); } 
-      else { toggleDarkMode(false); }
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        state.darkMode = true;
+        toggleDarkMode(true);
+      } else {
+        toggleDarkMode(false);
+      }
       switchTab('cq');
     }
 
@@ -463,8 +612,12 @@
     }
 
     function toggleDarkMode(force) {
-      if (force === undefined) { state.darkMode = !state.darkMode; } else { state.darkMode = force; }
-      const htmlEl = document.documentElement; const themeBtn = document.getElementById('theme-toggle-btn');
+      if (force === undefined) { state.darkMode = !state.darkMode; } 
+      else { state.darkMode = force; }
+      
+      const htmlEl = document.documentElement;
+      const themeBtn = document.getElementById('theme-toggle-btn');
+      
       if (state.darkMode) {
         htmlEl.classList.add('dark');
         themeBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41m12.73-12.73l-1.41 1.41"/></svg>';
@@ -480,7 +633,8 @@
     function switchTab(tabId) {
       state.activeTab = tabId;
       ['cq', 'hvac', 'bandejas'].forEach(tab => {
-        const btn = document.getElementById(`tab-${tab}-btn`); const btnMob = document.getElementById(`tab-${tab}-btn-mob`);
+        const btn = document.getElementById(`tab-${tab}-btn`);
+        const btnMob = document.getElementById(`tab-${tab}-btn-mob`);
         if (tab === tabId) {
           if (btn) btn.className = "px-4 py-1.5 rounded-md text-xs font-bold transition-all flex items-center gap-2 bg-white dark:bg-brand text-brand dark:text-white shadow";
           if (btnMob) btnMob.className = "px-4 py-2 rounded-md text-xs font-bold transition-all bg-brand dark:bg-brand-accent text-white shadow";
@@ -499,14 +653,21 @@
     }
 
     function copyTextToClipboard(text, elementId) {
-      const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
-      const btn = document.getElementById(elementId); const originalText = btn.innerHTML;
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      const btn = document.getElementById(elementId);
+      const originalText = btn.innerHTML;
       btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline"><polyline points="20 6 9 17 4 12"/></svg> Copiado!`;
       setTimeout(() => { btn.innerHTML = originalText; }, 1500);
     }
 
     function renderEarthingBoxesTable() {
-      const tbody = document.getElementById('earthing-boxes-tbody'); if (!tbody) return;
+      const tbody = document.getElementById('earthing-boxes-tbody');
+      if (!tbody) return;
       tbody.innerHTML = EARTHING_BOXES.map(box => `
         <tr class="border-b border-zinc-200 dark:border-brand-light hover:bg-slate-50 dark:hover:bg-brand-light/10 transition-colors">
           <td class="p-3 font-black text-brand dark:text-brand-accent whitespace-nowrap">${box.displayName || box.id}</td>
@@ -518,69 +679,45 @@
       `).join('');
     }
 
-    function openModal(modalId) { const m = document.getElementById(modalId); if(m) { m.classList.remove('hidden'); m.classList.add('flex'); if(modalId === 'modal-boxes') renderEarthingBoxesTable(); } }
-    function closeModal(modalId) { const m = document.getElementById(modalId); if(m) { m.classList.add('hidden'); m.classList.remove('flex'); } }
-
-    // --- CHECKLIST POKA-YOKE ---
-    function getIconForId(id) {
-      const icons = {
-        chk1: '<path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>',
-        chk2: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
-        chk3: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/>',
-        chk4: '<polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',
-        chk5: '<line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/>',
-        chk11: '<rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><line x1="3" x2="21" y1="9" y2="9"/><line x1="9" x2="9" y1="21" y2="9"/>',
-        chk12: '<polyline points="4 7 4 4 20 4 20 7"/><line x1="9" x2="15" y1="20" y2="20"/><line x1="12" x2="12" y1="4" y2="20"/>',
-        chk13: '<line x1="21" x2="3" y1="6" y2="6"/><line x1="15" x2="3" y1="12" y2="12"/><line x1="17" x2="3" y1="18" y2="18"/>',
-        chk6: '<circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>',
-        chk7: '<path d="M21 21L3 3"/><path d="M21 3v6"/><path d="M21 3h-6"/><path d="M3 21v-6"/><path d="M3 21h6"/>',
-        chk8: '<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" x2="8.12" y1="4" y2="15.88"/><line x1="14.47" x2="20" y1="14.48" y2="20"/><line x1="8.12" x2="12" y1="8.12" y2="12"/>',
-        chk9: '<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
-        chk10: '<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>',
-        chk14: '<path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/>',
-        chk15: '<circle cx="12" cy="12" r="3"/><line x1="3" x2="9" y1="12" y2="12"/><line x1="15" x2="21" y1="12" y2="12"/>',
-        chk16: '<polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/>',
-        chk17: '<rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><line x1="3" x2="21" y1="9" y2="9"/><line x1="3" x2="21" y1="15" y2="15"/><line x1="12" x2="12" y1="3" y2="21"/>',
-        chk18: '<path d="M12 2l8 14H4z"/><path d="M12 22a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/>',
-        chk19: '<path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>',
-        chk20: '<rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><line x1="8" x2="16" y1="12" y2="12"/><line x1="12" x2="12" y1="8" y2="16"/>'
-      };
-      const svgPath = icons[id] || '<circle cx="12" cy="12" r="10"/>';
-      return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${svgPath}</svg>`;
+    function openModal(modalId) {
+      const modal = document.getElementById(modalId);
+      if(modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        if (modalId === 'modal-boxes') renderEarthingBoxesTable();
+      }
     }
 
-    function toggleChecklist(itemId, action = 'checked', isUnlocked = true) {
-      if (!isUnlocked) return;
-      let flatItems = []; CHECKLIST_DATA.forEach(c => flatItems.push(...c.items));
-      let index = flatItems.findIndex(i => i.id === itemId);
-
-      if (state.checkedItems[itemId] === action) {
-        for (let i = index; i < flatItems.length; i++) delete state.checkedItems[flatItems[i].id];
-      } else {
-        state.checkedItems[itemId] = action;
+    function closeModal(modalId) {
+      const modal = document.getElementById(modalId);
+      if(modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
       }
+    }
+
+    function toggleChecklist(itemId, action = 'checked') {
+      if (state.checkedItems[itemId] === action) { delete state.checkedItems[itemId]; } 
+      else { state.checkedItems[itemId] = action; }
       renderChecklist();
     }
 
-    function clearChecklist() { state.checkedItems = {}; renderChecklist(); }
+    function clearChecklist() {
+      state.checkedItems = {};
+      renderChecklist();
+    }
 
+    // RENDER: ABA DO CHECKLIST (Com Botão KPI flutuando APENAS aqui)
     function renderChecklist() {
-      let totalItems = 0; let checkedCount = 0;
-      const itemStates = {}; let previousDone = true; let flatItems = [];
-      let itemNumberCounter = 1;
+      let totalItems = 0;
+      let checkedCount = 0;
 
       CHECKLIST_DATA.forEach(cat => {
         cat.items.forEach(item => {
-          flatItems.push(item);
           totalItems++;
-          const status = state.checkedItems[item.id];
-          const isDone = (status === 'checked' || status === 'na');
-          if (status) checkedCount++; 
-          itemStates[item.id] = { isDone: isDone, isUnlocked: previousDone };
-          previousDone = isDone; 
+          if (state.checkedItems[item.id]) checkedCount++; 
         });
       });
-
       const progress = totalItems === 0 ? 0 : Math.round((checkedCount / totalItems) * 100);
 
       const renderCategoriesBlock = (categories) => {
@@ -588,66 +725,38 @@
           return `
             <div class="bg-white dark:bg-brand p-5 rounded-xl border border-zinc-200 dark:border-brand-light shadow-sm print-break-inside-avoid">
               <h3 class="text-sm font-black text-zinc-800 dark:text-white mb-4 flex items-center gap-2 border-b border-zinc-100 dark:border-brand-darker pb-2">
-                <span class="w-2 h-2 rounded-full bg-brand dark:bg-brand-accent"></span> ${cat.category}
+                <span class="w-2 h-2 rounded-full bg-brand dark:bg-brand-accent"></span>
+                ${cat.category}
               </h3>
               <div class="space-y-3">
                 ${cat.items.map(item => {
                   const status = state.checkedItems[item.id];
-                  const isChecked = status === 'checked'; const isNa = status === 'na';
-                  const isDone = isChecked || isNa; const isUnlocked = itemStates[item.id].isUnlocked;
-                  const currentNum = itemNumberCounter++;
-                  const isItem5 = item.id === 'chk5'; // Regra do N/A apenas no chk5
+                  const isChecked = status === 'checked';
+                  const isNa = status === 'na';
+                  const isDone = isChecked || isNa;
                   
                   let textClasses = 'text-xs leading-relaxed flex-1 mt-0.5 transition-all ';
-                  let containerClasses = 'flex items-start gap-3 p-3 rounded-lg border transition-all ';
-                  
-                  if (isDone) {
-                      textClasses += 'text-zinc-500 dark:text-zinc-400 font-semibold line-through opacity-70 print-gray ';
-                      containerClasses += 'bg-slate-50 border-brand-accent/40 dark:bg-brand-darker dark:border-brand-accent/50 cursor-pointer ';
-                  } else if (!isUnlocked) {
-                      textClasses += 'text-zinc-400 dark:text-zinc-600 font-bold print-strike ';
-                      containerClasses += 'bg-slate-50/50 dark:bg-brand-darker/40 border-zinc-200 dark:border-brand-darker cursor-not-allowed opacity-60 grayscale ';
-                  } else {
-                      textClasses += 'text-zinc-700 dark:text-zinc-200 font-bold print-strike ';
-                      containerClasses += 'bg-white border-brand-accent dark:bg-brand dark:border-brand-light hover:border-brand cursor-pointer shadow-sm ring-1 ring-brand-accent/30 ';
-                  }
-
-                  let lockIcon = '';
-                  if (!isUnlocked) {
-                    lockIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-400"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`;
-                  } else if (!isDone) {
-                    lockIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-brand-accent dark:text-amber-400 animate-pulse"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>`;
-                  } else {
-                    lockIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-500"><path d="M20 6 9 17l-5-5"/></svg>`;
-                  }
+                  if (isDone) { textClasses += 'text-zinc-500 dark:text-zinc-400 font-semibold line-through opacity-70 '; } 
+                  else { textClasses += 'text-zinc-700 dark:text-zinc-200 font-bold '; }
+                  if (isDone) { textClasses += 'print-gray '; } 
+                  else { textClasses += 'print-strike '; }
                   
                   return `
-                    <div class="${containerClasses}" onclick="toggleChecklist('${item.id}', 'checked', ${isUnlocked})">
-                      <div class="mt-0.5 w-5 h-5 rounded border flex items-center justify-center shrink-0 transition-colors ${isChecked ? 'bg-brand dark:bg-brand-accent border-brand text-white' : (isNa ? 'bg-zinc-400 border-zinc-400 text-white' : 'border-zinc-300 bg-transparent')}">
+                    <div class="flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${isDone ? 'bg-slate-50 border-brand-accent/40 dark:bg-brand-darker dark:border-brand-accent/50' : 'bg-white border-zinc-200 hover:border-brand-accent/60 dark:bg-brand dark:border-brand-light dark:hover:border-white/50'}" onclick="toggleChecklist('${item.id}', 'checked')">
+                      <div class="mt-0.5 w-5 h-5 rounded border flex items-center justify-center shrink-0 transition-colors ${isChecked ? 'bg-brand dark:bg-brand-accent border-brand text-white' : (isNa ? 'bg-zinc-400 border-zinc-400 text-white dark:bg-zinc-600 dark:border-zinc-600' : 'border-zinc-300 dark:border-brand-light bg-transparent')}">
                         ${isChecked ? '✓' : (isNa ? '-' : '')}
                       </div>
-
-                      <div class="mt-0.5 flex items-center justify-center shrink-0 no-print" title="Poka-Yoke">
-                          ${lockIcon}
-                      </div>
-
                       <div class="flex-1 flex flex-col sm:flex-row sm:items-start justify-between gap-2">
-                        <span class="${textClasses}">
-                           <span class="mr-1.5 opacity-60 font-black">${currentNum}.</span>${item.text}
-                        </span>
-                        
+                        <span class="${textClasses}">${item.text}</span>
                         <div class="flex flex-wrap gap-2 shrink-0 mt-2 sm:mt-0 items-center no-print">
-                          ${isItem5 ? `<button onclick="event.stopPropagation(); toggleChecklist('${item.id}', 'na', ${isUnlocked})" class="px-2 py-0.5 rounded text-[10px] font-bold border transition-colors ${isNa ? 'bg-zinc-600 text-white border-zinc-700 dark:bg-zinc-300 dark:text-zinc-900' : 'bg-zinc-100 text-zinc-500 border-zinc-200 hover:bg-zinc-200 dark:bg-brand-darker dark:text-zinc-400 dark:border-brand-light dark:hover:bg-brand-light/30'} ${!isUnlocked ? 'pointer-events-none' : ''}">Não Aplicável</button>` : ''}
+                          <button onclick="event.stopPropagation(); toggleChecklist('${item.id}', 'na')" class="px-2 py-0.5 rounded text-[10px] font-bold border transition-colors ${isNa ? 'bg-zinc-600 text-white border-zinc-700 dark:bg-zinc-300 dark:text-zinc-900' : 'bg-zinc-100 text-zinc-500 border-zinc-200 hover:bg-zinc-200 dark:bg-brand-darker dark:text-zinc-400 dark:border-brand-light dark:hover:bg-brand-light/30'}">N/A</button>
                           ${item.tag ? `<span class="px-2 py-0.5 rounded text-[10px] font-medium bg-zinc-100 text-zinc-600 dark:bg-brand-darker dark:text-zinc-300">${item.tag}</span>` : ''}
                           ${item.tagImportant ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-700 dark:bg-rose-950/60 dark:text-rose-300">${item.tagImportant}</span>` : ''}
                         </div>
-                        
-                        <!-- Area Corretor (Impressão) -->
                         <div class="print-area-corretor ml-2 border-l-2 border-zinc-300 pl-3 flex items-center gap-2 shrink-0">
                            <span class="text-[9px] font-black uppercase text-zinc-500 tracking-wider">Corretor</span>
                            <div class="w-5 h-5 border-2 border-black rounded-sm bg-white shadow-sm flex-shrink-0"></div>
                         </div>
-
                       </div>
                     </div>
                   `;
@@ -658,124 +767,64 @@
         }).join('');
       };
 
-      let visualGridHTML = flatItems.map((item, i) => {
-        const stateInfo = itemStates[item.id]; const iconSvg = getIconForId(item.id);
-        let borderColor, textColor, bgColor, statusText, badgeHtml;
-        
-        if (stateInfo.isDone) {
-          borderColor = "border-emerald-500 dark:border-emerald-400"; textColor = "text-emerald-600 dark:text-emerald-400"; bgColor = "bg-emerald-50 dark:bg-emerald-900/20"; statusText = "[ OK ]";
-          badgeHtml = `<div class="absolute -top-1.5 -right-1.5 bg-emerald-500 text-white rounded-full w-4 h-4 flex items-center justify-center shadow"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>`;
-        } else if (stateInfo.isUnlocked) {
-          borderColor = "border-amber-400 dark:border-amber-500 ring-2 ring-amber-400/50 animate-pulse"; textColor = "text-amber-600 dark:text-amber-400"; bgColor = "bg-amber-50 dark:bg-amber-900/20"; statusText = "[ AÇÃO ]";
-          badgeHtml = `<div class="absolute -top-1.5 -right-1.5 flex h-4 w-4"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span><span class="relative inline-flex rounded-full h-4 w-4 bg-amber-500 border-2 border-white dark:border-brand"></span></div>`;
-        } else {
-          borderColor = "border-zinc-200 dark:border-zinc-700 opacity-60"; textColor = "text-zinc-400 dark:text-zinc-600"; bgColor = "bg-slate-50 dark:bg-brand-darker/40"; statusText = "[ BLOQ ]";
-          badgeHtml = `<div class="absolute -top-1.5 -right-1.5 bg-white dark:bg-brand text-zinc-400 border border-zinc-200 dark:border-zinc-700 rounded-full w-4 h-4 flex items-center justify-center shadow-sm"><svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>`;
-        }
-
-        return `
-          <div class="relative flex flex-col items-center justify-center p-3 rounded-lg border-2 ${borderColor} ${bgColor} transition-all duration-300">
-             ${badgeHtml}
-             <div class="mb-2 ${textColor}">${iconSvg}</div>
-             <div class="text-[9px] font-black tracking-widest ${textColor}">${statusText}</div>
-             <div class="text-[8px] font-bold text-zinc-400 dark:text-zinc-500 mt-1 uppercase">ITEM ${i + 1}</div>
-          </div>
-        `;
-      }).join('');
-
       let html = `
         <div class="space-y-6 animate-fadeIn">
-          
-          <!-- CABEÇALHO DO PDF -->
-          <div class="print-only mb-8 p-6 border-2 border-black rounded-xl print-break-inside-avoid bg-white">
+          <div class="print-only mb-8 p-6 border-2 border-black rounded-xl">
              <div class="text-2xl font-black uppercase mb-6 text-center text-black tracking-widest">Checklist de Qualidade - Inspeção</div>
-             <div class="grid grid-cols-2 gap-6">
-                <div class="flex flex-col gap-4">
-                   <div class="flex items-end gap-3">
-                      <span class="font-black text-sm uppercase tracking-wider text-black w-32">Documento:</span>
-                      <div id="print-sheet" class="flex-1 border-b-2 border-black text-xl font-mono px-2 text-black h-8">${state.sheetName}</div>
-                   </div>
-                   <div class="flex items-end gap-3">
-                      <span class="font-black text-sm uppercase tracking-wider text-black w-32">Sala:</span>
-                      <div id="print-room" class="flex-1 border-b-2 border-black text-xl font-mono px-2 text-black uppercase h-8">${state.roomName}</div>
-                   </div>
-                </div>
-                <div class="flex flex-col gap-4">
-                   <div class="flex items-end gap-3">
-                      <span class="font-black text-sm uppercase tracking-wider text-black w-32">Responsável:</span>
-                      <div id="print-author" class="flex-1 border-b-2 border-black text-xl font-mono px-2 text-black uppercase h-8">${state.authorName}</div>
-                   </div>
-                   <div class="flex items-end gap-3">
-                      <span class="font-black text-sm uppercase tracking-wider text-black w-32">Visto Corretor:</span>
-                      <div class="flex-1 border-b-2 border-black h-8 flex items-end pb-1 justify-center">
-                         <div class="w-6 h-6 border-2 border-black rounded-sm bg-white"></div>
-                      </div>
-                   </div>
-                </div>
+             <div class="flex flex-col gap-4">
+                <div class="flex items-end gap-3"><span class="font-black text-sm uppercase tracking-wider text-black w-32">Documento:</span><div id="print-sheet" class="flex-1 border-b-2 border-black text-xl font-mono px-2 text-black h-8">${state.sheetName}</div></div>
+                <div class="flex items-end gap-3"><span class="font-black text-sm uppercase tracking-wider text-black w-32">Sala:</span><div id="print-room" class="flex-1 border-b-2 border-black text-xl font-mono px-2 text-black uppercase h-8">${state.roomName}</div></div>
+                <div class="flex items-end gap-3"><span class="font-black text-sm uppercase tracking-wider text-black w-32">Responsável:</span><div id="print-author" class="flex-1 border-b-2 border-black text-xl font-mono px-2 text-black uppercase h-8">${state.authorName}</div></div>
              </div>
           </div>
 
-          <!-- ENTRADA DE DADOS -->
           <div class="flex flex-col md:flex-row gap-4 justify-between items-center bg-white dark:bg-brand p-4 rounded-xl border border-zinc-200 dark:border-brand-light shadow-sm no-print">
             <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:flex-1">
-              <input type="text" id="sheetNameInput" value="${state.sheetName}" oninput="state.sheetName = this.value; if(document.getElementById('print-sheet')) document.getElementById('print-sheet').innerText = this.value;" placeholder="Documento/Folha (Ex: Layout_001)" class="bg-slate-100 dark:bg-brand-darker border border-zinc-200 dark:border-brand-light px-3 py-2 rounded-lg text-sm font-bold w-full outline-none focus:border-brand-accent transition-colors text-zinc-900 dark:text-zinc-100"/>
-              <input type="text" id="roomNameInput" value="${state.roomName}" oninput="state.roomName = this.value; if(document.getElementById('print-room')) document.getElementById('print-room').innerText = this.value;" placeholder="Nome da Sala" class="bg-slate-100 dark:bg-brand-darker border border-zinc-200 dark:border-brand-light px-3 py-2 rounded-lg text-sm font-bold w-full outline-none focus:border-brand-accent transition-colors text-zinc-900 dark:text-zinc-100"/>
-              <input type="text" id="authorNameInput" value="${state.authorName}" oninput="state.authorName = this.value; if(document.getElementById('print-author')) document.getElementById('print-author').innerText = this.value;" placeholder="Seu Nome (Responsável)" class="bg-slate-100 dark:bg-brand-darker border border-zinc-200 dark:border-brand-light px-3 py-2 rounded-lg text-sm font-bold w-full outline-none focus:border-brand-accent transition-colors text-zinc-900 dark:text-zinc-100"/>
+              <input type="text" id="sheetNameInput" value="${state.sheetName}" oninput="state.sheetName = this.value; document.getElementById('print-sheet').innerText = this.value" placeholder="Documento/Folha" class="bg-slate-100 dark:bg-brand-darker border border-zinc-200 dark:border-brand-light px-3 py-2 rounded-lg text-sm font-bold w-full outline-none focus:border-brand-accent transition-colors text-zinc-900 dark:text-zinc-100"/>
+              <input type="text" id="roomNameInput" value="${state.roomName}" oninput="state.roomName = this.value; document.getElementById('print-room').innerText = this.value" placeholder="Nome da Sala" class="bg-slate-100 dark:bg-brand-darker border border-zinc-200 dark:border-brand-light px-3 py-2 rounded-lg text-sm font-bold w-full outline-none focus:border-brand-accent transition-colors text-zinc-900 dark:text-zinc-100"/>
+              <input type="text" id="authorNameInput" value="${state.authorName}" oninput="state.authorName = this.value; document.getElementById('print-author').innerText = this.value" placeholder="Responsável" class="bg-slate-100 dark:bg-brand-darker border border-zinc-200 dark:border-brand-light px-3 py-2 rounded-lg text-sm font-bold w-full outline-none focus:border-brand-accent transition-colors text-zinc-900 dark:text-zinc-100"/>
             </div>
-
             <div class="flex flex-wrap gap-2 justify-end w-full md:w-auto shrink-0">
               <button onclick="clearChecklist()" class="px-3 py-2 rounded-lg bg-rose-50 text-rose-600 border border-rose-200 dark:bg-rose-950/40 dark:border-rose-900/50 dark:text-rose-400 font-bold text-xs hover:opacity-80 transition-colors flex items-center gap-1">Limpar</button>
               <button onclick="handlePrint()" class="px-3 py-2 rounded-lg bg-zinc-800 text-white border border-zinc-800 dark:bg-brand-light dark:border-brand-accent dark:text-zinc-100 font-bold text-xs hover:opacity-90 transition-colors flex items-center gap-1">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline mr-1"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
-                Imprimir
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline mr-1"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg> Imprimir
               </button>
             </div>
           </div>
 
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 pb-10 items-start">
-             
-             <!-- Coluna Esquerda (Checklist) -->
-             <div class="lg:col-span-8 space-y-6">
-                <div class="flex items-center gap-3 mb-2">
-                   <div class="w-2 h-6 bg-brand dark:bg-brand-accent rounded-sm no-print"></div>
-                   <h2 class="text-base font-black uppercase tracking-widest text-brand dark:text-white no-print">Checklist Interno</h2>
-                </div>
-                ${renderCategoriesBlock(CHECKLIST_DATA)}
-             </div>
-
-             <!-- Coluna Direita (Painel Visual) -->
-             <div class="lg:col-span-4 no-print">
-                <div class="sticky top-24 bg-white dark:bg-brand p-5 rounded-xl border border-zinc-200 dark:border-brand-light shadow-lg">
-                   <div class="flex items-center gap-2 mb-4 text-brand dark:text-white">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                      <h2 class="text-sm font-black uppercase tracking-wider">Controle Visual</h2>
-                   </div>
-                   <div class="mb-5">
-                      <div class="flex justify-between items-center mb-2">
-                        <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Verificação de Integridade</span>
-                        <span class="text-xs font-black text-emerald-600 dark:text-emerald-400">${progress}%</span>
-                      </div>
-                      <div class="w-full bg-slate-200 dark:bg-brand-darker h-2.5 rounded-full overflow-hidden">
-                        <div class="bg-emerald-500 h-full transition-all duration-300 ease-out" style="width: ${progress}%"></div>
-                      </div>
-                   </div>
-                   <div class="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4 gap-3 max-h-[60vh] overflow-y-auto p-1 pb-4">
-                      ${visualGridHTML}
-                   </div>
-                </div>
-             </div>
+          <div class="bg-white dark:bg-brand p-4 rounded-xl border border-zinc-200 dark:border-brand-light shadow-sm no-print">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-xs font-black uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Progresso Geral</span>
+              <span class="text-sm font-black text-brand dark:text-brand-accent">${progress}%</span>
+            </div>
+            <div class="w-full bg-slate-200 dark:bg-brand-darker h-2 rounded-full overflow-hidden">
+              <div class="bg-brand dark:bg-brand-accent h-full transition-all duration-300 ease-out" style="width: ${progress}%"></div>
+            </div>
           </div>
+
+          <div class="mt-8 mb-2 flex items-center gap-3">
+             <div class="w-2 h-6 bg-brand dark:bg-brand-accent rounded-sm no-print"></div>
+             <h2 class="text-base font-black uppercase tracking-widest text-brand dark:text-white no-print">Checklist Interno</h2>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-20">
+            ${renderCategoriesBlock(CHECKLIST_DATA)}
+          </div>
+          
+          <!-- BOTÃO FLUTUANTE DE KPI (Visível APENAS na aba Checklist) -->
+          <div class="fixed bottom-6 right-6 z-40 flex flex-col gap-3 no-print">
+            <button onclick="openKpiApp()" class="bg-rose-600 hover:bg-rose-700 text-white rounded-full w-14 h-14 shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.2)] transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center group border border-rose-400 outline-none">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+              <span class="absolute right-full mr-4 bg-zinc-800 text-white text-[10px] font-black uppercase tracking-widest px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap pointer-events-none shadow-md border border-zinc-700">KPIs / Analytics</span>
+            </button>
+          </div>
+
         </div>
       `;
       document.getElementById('main-container').innerHTML = html;
     }
 
-    // --- HVAC / TUBULAÇÕES ---
-    function selectHvacScope(scope) {
-      state.hvacScope = scope;
-      if (scope === 'piping') { state.hvacGeom = 'Circular'; if (state.hvacMaterial === 'Equipamento') state.hvacMaterial = 'Aço Carbono'; }
-      renderHVAC();
-    }
+    function selectHvacScope(scope) { state.hvacScope = scope; if (scope === 'piping') { state.hvacGeom = 'Circular'; if (state.hvacMaterial === 'Equipamento') state.hvacMaterial = 'Aço Carbono'; } renderHVAC(); }
     function selectHvacMaterial(material) { state.hvacMaterial = material; renderHVAC(); }
     function selectHvacGeom(geom) { if (state.hvacMaterial !== 'Equipamento') { state.hvacGeom = geom; renderHVAC(); } }
     function selectHvacIso(iso) { if (state.hvacMaterial !== 'Equipamento') { state.hvacIso = iso; renderHVAC(); } }
@@ -796,108 +845,45 @@
     function renderHVAC() {
       const list = state.hvacScope === 'hvac' ? DB_HVAC : DB_PIPING;
       const isEquipment = state.hvacMaterial === 'Equipamento';
-      const matched = isEquipment 
-        ? list.find(i => i.material === 'Equipamento') 
-        : list.find(i => i.material === state.hvacMaterial && i.geometry === state.hvacGeom && i.insulated === state.hvacIso);
+      const matched = isEquipment ? list.find(i => i.material === 'Equipamento') : list.find(i => i.material === state.hvacMaterial && i.geometry === state.hvacGeom && i.insulated === state.hvacIso);
       const finalTypical = matched ? (isEquipment ? 'E53D' : (state.hvacConn === 'jumper' ? matched.typicalJumper : matched.typicalGround)) : "N/A";
 
       const strokeColor = state.darkMode ? '#e4e4e7' : '#18181b';
       const strokeBg = state.darkMode ? '#00161f' : '#f4f4f5';
       const borderBg = state.darkMode ? '#003e57' : '#e4e4e7';
       const textColor = state.darkMode ? '#f4f4f5' : '#18181b';
-
       const materials = ['Aço Carbono', 'Aço Inoxidável', 'Aço Galvanizado'];
-      if (state.hvacScope === 'piping') materials.push('Cobre');
-      else materials.push('Equipamento');
+      if (state.hvacScope === 'piping') materials.push('Cobre'); else materials.push('Equipamento');
 
       let svgHTML = '';
       if (finalTypical !== "N/A") {
         const code = finalTypical.toUpperCase();
-        if (code.includes('E53D')) {
-          svgHTML = `<svg viewBox="0 0 400 220" class="w-full h-auto rounded-xl border bg-slate-50 border-zinc-200 dark:bg-brand-darker dark:border-brand-light p-4"><text x="20" y="25" fill="${textColor}" font-size="11" font-weight="600">ATERRAMENTO DE EQUIPAMENTO (E53D)</text><rect x="70" y="70" width="160" height="100" fill="${strokeBg}" stroke="${strokeColor}" stroke-width="3" rx="2" /><text x="80" y="120" fill="${textColor}" font-size="10" font-weight="500">Carcaça do Equip.</text><circle cx="180" cy="120" r="12" fill="${state.darkMode ? '#003e57' : '#d4d4d8'}" /><path d="M 180 120 C 230 120, 260 170, 330 170" stroke="#10b981" stroke-width="6" stroke-linecap="round" fill="none" /><rect x="171" y="114" width="18" height="12" fill="#d97706" rx="1" /><text x="245" y="105" fill="${textColor}" font-size="11" font-weight="600">Pino M10</text><text x="245" y="120" fill="#10b981" font-size="10" font-weight="600">Cabo 16mm²</text></svg>`;
-        } else if (code.includes('E51A') || code.includes('E53A')) {
-          svgHTML = `<svg viewBox="0 0 400 220" class="w-full h-auto rounded-xl border bg-slate-50 border-zinc-200 dark:bg-brand-darker dark:border-brand-light p-4"><text x="20" y="25" fill="${textColor}" font-size="11" font-weight="600">CONEXÃO DIRETA (E51A/E53A)</text><path d="M 60 170 L 190 170 L 190 60" stroke="${strokeColor}" stroke-width="4" fill="none" /><rect x="175" y="155" width="30" height="30" fill="${strokeBg}" stroke="${borderBg}" rx="1" /><path d="M 196 115 C 250 115, 270 180, 340 180" stroke="#10b981" stroke-width="6" stroke-linecap="round" fill="none" /><rect x="187" y="108" width="18" height="14" fill="#d97706" rx="2" /><text x="225" y="95" fill="${textColor}" font-size="11" font-weight="600">LUG de Cobre</text></svg>`;
-        } else if (code.includes('E51B') || code.includes('E53B') || code.includes('E115') || code.includes('E59')) {
-          svgHTML = `<svg viewBox="0 0 400 220" class="w-full h-auto rounded-xl border bg-slate-50 border-zinc-200 dark:bg-brand-darker dark:border-brand-light p-4"><text x="20" y="25" fill="${textColor}" font-size="11" font-weight="600">SÉRIE COM ISOLAMENTO (E115/E59)</text><rect x="60" y="110" width="280" height="30" fill="${strokeBg}" stroke="${borderBg}" /><rect x="60" y="85" width="280" height="25" fill="#fef08a" opacity="0.3" stroke="#facc15" stroke-width="1" stroke-dasharray="3 3" /><text x="210" y="102" fill="#ca8a04" font-size="9" font-weight="600">Isolamento Elétrico</text><path d="M 200 80 C 240 50, 280 50, 320 80" stroke="#10b981" stroke-width="6" stroke-linecap="round" fill="none" /><text x="225" y="175" fill="${textColor}" font-size="11" font-weight="600">Pino Extensor</text></svg>`;
-        } else if (code.includes('E57')) {
-          svgHTML = `<svg viewBox="0 0 400 220" class="w-full h-auto rounded-xl border bg-slate-50 border-zinc-200 dark:bg-brand-darker dark:border-brand-light p-4"><text x="20" y="25" fill="${textColor}" font-size="11" font-weight="600">ORELHA SOLDADA (E57)</text><path d="M 70 170 C 70 90, 150 70, 240 70" stroke="${strokeBg}" stroke-width="16" fill="none" stroke-linecap="round" /><path d="M 180 38 C 230 38, 275 90, 320 110" stroke="#10b981" stroke-width="6" stroke-linecap="round" fill="none" /><rect x="172" y="32" width="16" height="12" fill="#d97706" rx="1" /><text x="210" y="155" fill="#f87171" font-size="11" font-weight="600">Soldadura de Campo</text></svg>`;
-        } else if (code.includes('E58') || code.includes('E52A')) {
-          svgHTML = `<svg viewBox="0 0 400 220" class="w-full h-auto rounded-xl border bg-slate-50 border-zinc-200 dark:bg-brand-darker dark:border-brand-light p-4"><text x="20" y="25" fill="${textColor}" font-size="11" font-weight="600">ABRAÇADEIRA (E58 / E52A)</text><circle cx="150" cy="120" r="45" fill="none" stroke="${strokeBg}" stroke-width="10" /><path d="M 133 70 C 100 40, 50 70, 35 110" stroke="#10b981" stroke-width="6" stroke-linecap="round" fill="none" /><text x="220" y="110" fill="${textColor}" font-size="11" font-weight="600">Abraçadeira Mecânica</text></svg>`;
-        } else {
-          svgHTML = `<svg viewBox="0 0 400 220" class="w-full h-auto rounded-xl border bg-slate-50 border-zinc-200 dark:bg-brand-darker dark:border-brand-light p-4"><text x="20" y="25" fill="${textColor}" font-size="11" font-weight="600">LIGAÇÃO EQUIPOTENCIAL</text><rect x="50" y="60" width="110" height="80" fill="${strokeBg}" stroke="${borderBg}" stroke-width="2" rx="4" /><path d="M 160 100 C 230 100, 260 170, 330 170" stroke="#10b981" stroke-width="6" stroke-linecap="round" fill="none" /><rect x="145" y="92" width="20" height="16" fill="#d97706" rx="2" /><text x="185" y="90" fill="${textColor}" font-size="11" font-weight="600">Aterramento de Continuidade</text></svg>`;
-        }
+        if (code.includes('E53D')) { svgHTML = `<svg viewBox="0 0 400 220" class="w-full h-auto rounded-xl border bg-slate-50 border-zinc-200 dark:bg-brand-darker dark:border-brand-light p-4"><text x="20" y="25" fill="${textColor}" font-size="11" font-weight="600">ATERRAMENTO DE EQUIPAMENTO (E53D)</text><rect x="70" y="70" width="160" height="100" fill="${strokeBg}" stroke="${strokeColor}" stroke-width="3" rx="2" /><text x="80" y="120" fill="${textColor}" font-size="10" font-weight="500">Carcaça do Equip.</text><circle cx="180" cy="120" r="12" fill="${state.darkMode ? '#003e57' : '#d4d4d8'}" /><path d="M 180 120 C 230 120, 260 170, 330 170" stroke="#10b981" stroke-width="6" stroke-linecap="round" fill="none" /><rect x="171" y="114" width="18" height="12" fill="#d97706" rx="1" /><text x="245" y="105" fill="${textColor}" font-size="11" font-weight="600">Pino M10</text><text x="245" y="120" fill="#10b981" font-size="10" font-weight="600">Cabo 16mm²</text></svg>`; } 
+        else if (code.includes('E51A') || code.includes('E53A')) { svgHTML = `<svg viewBox="0 0 400 220" class="w-full h-auto rounded-xl border bg-slate-50 border-zinc-200 dark:bg-brand-darker dark:border-brand-light p-4"><text x="20" y="25" fill="${textColor}" font-size="11" font-weight="600">CONEXÃO DIRETA (E51A/E53A)</text><path d="M 60 170 L 190 170 L 190 60" stroke="${strokeColor}" stroke-width="4" fill="none" /><rect x="175" y="155" width="30" height="30" fill="${strokeBg}" stroke="${borderBg}" rx="1" /><path d="M 196 115 C 250 115, 270 180, 340 180" stroke="#10b981" stroke-width="6" stroke-linecap="round" fill="none" /><rect x="187" y="108" width="18" height="14" fill="#d97706" rx="2" /><text x="225" y="95" fill="${textColor}" font-size="11" font-weight="600">LUG de Cobre</text></svg>`; } 
+        else if (code.includes('E51B') || code.includes('E53B') || code.includes('E115') || code.includes('E59')) { svgHTML = `<svg viewBox="0 0 400 220" class="w-full h-auto rounded-xl border bg-slate-50 border-zinc-200 dark:bg-brand-darker dark:border-brand-light p-4"><text x="20" y="25" fill="${textColor}" font-size="11" font-weight="600">SÉRIE COM ISOLAMENTO (E115/E59)</text><rect x="60" y="110" width="280" height="30" fill="${strokeBg}" stroke="${borderBg}" /><rect x="60" y="85" width="280" height="25" fill="#fef08a" opacity="0.3" stroke="#facc15" stroke-width="1" stroke-dasharray="3 3" /><text x="210" y="102" fill="#ca8a04" font-size="9" font-weight="600">Isolamento Elétrico</text><path d="M 200 80 C 240 50, 280 50, 320 80" stroke="#10b981" stroke-width="6" stroke-linecap="round" fill="none" /><text x="225" y="175" fill="${textColor}" font-size="11" font-weight="600">Pino Extensor</text></svg>`; } 
+        else if (code.includes('E57')) { svgHTML = `<svg viewBox="0 0 400 220" class="w-full h-auto rounded-xl border bg-slate-50 border-zinc-200 dark:bg-brand-darker dark:border-brand-light p-4"><text x="20" y="25" fill="${textColor}" font-size="11" font-weight="600">ORELHA SOLDADA (E57)</text><path d="M 70 170 C 70 90, 150 70, 240 70" stroke="${strokeBg}" stroke-width="16" fill="none" stroke-linecap="round" /><path d="M 180 38 C 230 38, 275 90, 320 110" stroke="#10b981" stroke-width="6" stroke-linecap="round" fill="none" /><rect x="172" y="32" width="16" height="12" fill="#d97706" rx="1" /><text x="210" y="155" fill="#f87171" font-size="11" font-weight="600">Soldadura de Campo</text></svg>`; } 
+        else if (code.includes('E58') || code.includes('E52A')) { svgHTML = `<svg viewBox="0 0 400 220" class="w-full h-auto rounded-xl border bg-slate-50 border-zinc-200 dark:bg-brand-darker dark:border-brand-light p-4"><text x="20" y="25" fill="${textColor}" font-size="11" font-weight="600">ABRAÇADEIRA (E58 / E52A)</text><circle cx="150" cy="120" r="45" fill="none" stroke="${strokeBg}" stroke-width="10" /><path d="M 133 70 C 100 40, 50 70, 35 110" stroke="#10b981" stroke-width="6" stroke-linecap="round" fill="none" /><text x="220" y="110" fill="${textColor}" font-size="11" font-weight="600">Abraçadeira Mecânica</text></svg>`; } 
+        else { svgHTML = `<svg viewBox="0 0 400 220" class="w-full h-auto rounded-xl border bg-slate-50 border-zinc-200 dark:bg-brand-darker dark:border-brand-light p-4"><text x="20" y="25" fill="${textColor}" font-size="11" font-weight="600">LIGAÇÃO EQUIPOTENCIAL</text><rect x="50" y="60" width="110" height="80" fill="${strokeBg}" stroke="${borderBg}" stroke-width="2" rx="4" /><path d="M 160 100 C 230 100, 260 170, 330 170" stroke="#10b981" stroke-width="6" stroke-linecap="round" fill="none" /><rect x="145" y="92" width="20" height="16" fill="#d97706" rx="2" /><text x="185" y="90" fill="${textColor}" font-size="11" font-weight="600">Aterramento de Continuidade</text></svg>`; }
       }
 
       let html = `
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-fadeIn">
           <div class="lg:col-span-6 space-y-6">
             <div class="bg-white dark:bg-brand p-6 rounded-xl border border-zinc-200 dark:border-brand-light shadow-sm flex flex-col gap-5">
-              <div>
-                <span class="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-2 block">1. Domínio Principal</span>
-                <div class="grid grid-cols-2 gap-2">
-                  <button onclick="selectHvacScope('hvac')" class="py-2 px-3 rounded-lg text-xs font-bold transition-all flex justify-center items-center gap-2 border ${state.hvacScope === 'hvac' ? 'bg-gradient-to-br from-blue-700 to-blue-500 text-white border-blue-600 shadow-md' : 'bg-slate-50 dark:bg-brand-darker text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-brand-light hover:bg-zinc-100'}">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline"><path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2"/><path d="M12.6 19.4A2 2 0 1 0 14 16H2"/></svg> Dutos HVAC
-                  </button>
-                  <button onclick="selectHvacScope('piping')" class="py-2 px-3 rounded-lg text-xs font-bold transition-all flex justify-center items-center gap-2 border ${state.hvacScope === 'piping' ? 'bg-gradient-to-br from-amber-600 to-orange-500 text-white border-orange-600 shadow-md' : 'bg-slate-50 dark:bg-brand-darker text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-brand-light hover:bg-zinc-100'}">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg> Tubulações
-                  </button>
-                </div>
-              </div>
-
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <span class="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-2 block">2. Material</span>
-                  <div class="flex flex-col gap-2">
-                    ${materials.map(mat => `<button onclick="selectHvacMaterial('${mat}')" class="py-1.5 px-3 rounded-md border text-xs transition-all ${getMaterialStyle(mat, state.hvacMaterial === mat)}">${mat}</button>`).join('')}
-                  </div>
-                </div>
-                <div>
-                  <span class="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-2 block">3. Geometria</span>
-                  <div class="flex flex-col gap-2">
-                    <button ${isEquipment ? 'disabled' : ''} onclick="selectHvacGeom('Retangular')" class="py-1.5 px-3 rounded-md border text-xs font-bold transition-all ${isEquipment ? 'opacity-30 cursor-not-allowed border-zinc-200 dark:border-brand-light text-zinc-400' : (state.hvacGeom === 'Retangular' ? 'border-brand-accent dark:border-white bg-brand/5 dark:bg-brand-light/30 text-brand dark:text-white' : 'border-zinc-200 dark:border-brand-light text-zinc-400 dark:text-zinc-500 opacity-60')}">Retangular</button>
-                    <button ${isEquipment ? 'disabled' : ''} onclick="selectHvacGeom('Circular')" class="py-1.5 px-3 rounded-md border text-xs font-bold transition-all ${isEquipment ? 'opacity-30 cursor-not-allowed border-zinc-200 dark:border-brand-light text-zinc-400' : (state.hvacGeom === 'Circular' ? 'border-brand-accent dark:border-white bg-brand/5 dark:bg-brand-light/30 text-brand dark:text-white' : 'border-zinc-200 dark:border-brand-light text-zinc-400 dark:text-zinc-500 opacity-60')}">Circular</button>
-                  </div>
-                </div>
-              </div>
-
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <span class="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-2 block">4. Isolamento</span>
-                  <div class="flex flex-col gap-2">
-                    <button ${isEquipment ? 'disabled' : ''} onclick="selectHvacIso('Sem Isolamento')" class="py-1.5 px-3 rounded-md border text-xs font-bold transition-all ${isEquipment ? 'opacity-30 cursor-not-allowed border-zinc-200 dark:border-brand-light text-zinc-400' : (state.hvacIso === 'Sem Isolamento' ? 'bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-950/60 dark:text-rose-200 dark:border-rose-600' : 'bg-transparent border-zinc-200 dark:border-brand-light text-zinc-500')}">Sem Isolamento</button>
-                    <button ${isEquipment ? 'disabled' : ''} onclick="selectHvacIso('Com Isolamento')" class="py-1.5 px-3 rounded-md border text-xs font-bold transition-all ${isEquipment ? 'opacity-30 cursor-not-allowed border-zinc-200 dark:border-brand-light text-zinc-400' : (state.hvacIso === 'Com Isolamento' ? 'bg-cyan-100 text-cyan-800 border-cyan-300 dark:bg-cyan-950/60 dark:text-cyan-200 dark:border-cyan-600' : 'bg-transparent border-zinc-200 dark:border-brand-light text-zinc-500')}">Com Isolamento</button>
-                  </div>
-                </div>
-                <div>
-                  <span class="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-2 block">5. Finalidade</span>
-                  <div class="flex flex-col gap-2">
-                    <button ${isEquipment ? 'disabled' : ''} onclick="selectHvacConn('jumper')" class="py-1.5 px-3 rounded-md border text-xs font-bold transition-all ${isEquipment ? 'opacity-30 cursor-not-allowed border-zinc-200 dark:border-brand-light text-zinc-400' : (state.hvacConn === 'jumper' ? 'border-brand dark:border-white bg-brand/5 dark:bg-brand-light/30 text-brand dark:text-white' : 'border-zinc-200 dark:border-brand-light text-zinc-400 dark:text-zinc-500')}">Jumper Coletor</button>
-                    <button ${isEquipment ? 'disabled' : ''} onclick="selectHvacConn('ground')" class="py-1.5 px-3 rounded-md border text-xs font-bold transition-all ${isEquipment ? 'opacity-30 cursor-not-allowed border-zinc-200 dark:border-brand-light text-zinc-400' : (state.hvacConn === 'ground' ? 'border-brand dark:border-white bg-brand/5 dark:bg-brand-light/30 text-brand dark:text-white' : 'border-zinc-200 dark:border-brand-light text-zinc-400 dark:text-zinc-500')}">Geral (Malha)</button>
-                  </div>
-                </div>
-              </div>
-
+              <div><span class="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-2 block">1. Domínio Principal</span><div class="grid grid-cols-2 gap-2"><button onclick="selectHvacScope('hvac')" class="py-2 px-3 rounded-lg text-xs font-bold transition-all flex justify-center items-center gap-2 border ${state.hvacScope === 'hvac' ? 'bg-gradient-to-br from-blue-700 to-blue-500 text-white border-blue-600 shadow-md' : 'bg-slate-50 dark:bg-brand-darker text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-brand-light hover:bg-zinc-100'}"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline"><path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2"/><path d="M12.6 19.4A2 2 0 1 0 14 16H2"/></svg> Dutos HVAC</button><button onclick="selectHvacScope('piping')" class="py-2 px-3 rounded-lg text-xs font-bold transition-all flex justify-center items-center gap-2 border ${state.hvacScope === 'piping' ? 'bg-gradient-to-br from-amber-600 to-orange-500 text-white border-orange-600 shadow-md' : 'bg-slate-50 dark:bg-brand-darker text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-brand-light hover:bg-zinc-100'}"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg> Tubulações</button></div></div>
+              <div class="grid grid-cols-2 gap-4"><div><span class="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-2 block">2. Material</span><div class="flex flex-col gap-2">${materials.map(mat => `<button onclick="selectHvacMaterial('${mat}')" class="py-1.5 px-3 rounded-md border text-xs transition-all ${getMaterialStyle(mat, state.hvacMaterial === mat)}">${mat}</button>`).join('')}</div></div><div><span class="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-2 block">3. Geometria</span><div class="flex flex-col gap-2"><button ${isEquipment ? 'disabled' : ''} onclick="selectHvacGeom('Retangular')" class="py-1.5 px-3 rounded-md border text-xs font-bold transition-all ${isEquipment ? 'opacity-30 cursor-not-allowed border-zinc-200 dark:border-brand-light text-zinc-400' : (state.hvacGeom === 'Retangular' ? 'border-brand-accent dark:border-white bg-brand/5 dark:bg-brand-light/30 text-brand dark:text-white' : 'border-zinc-200 dark:border-brand-light text-zinc-400 dark:text-zinc-500 opacity-60')}">Retangular</button><button ${isEquipment ? 'disabled' : ''} onclick="selectHvacGeom('Circular')" class="py-1.5 px-3 rounded-md border text-xs font-bold transition-all ${isEquipment ? 'opacity-30 cursor-not-allowed border-zinc-200 dark:border-brand-light text-zinc-400' : (state.hvacGeom === 'Circular' ? 'border-brand-accent dark:border-white bg-brand/5 dark:bg-brand-light/30 text-brand dark:text-white' : 'border-zinc-200 dark:border-brand-light text-zinc-400 dark:text-zinc-500 opacity-60')}">Circular</button></div></div></div>
+              <div class="grid grid-cols-2 gap-4"><div><span class="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-2 block">4. Isolamento</span><div class="flex flex-col gap-2"><button ${isEquipment ? 'disabled' : ''} onclick="selectHvacIso('Sem Isolamento')" class="py-1.5 px-3 rounded-md border text-xs font-bold transition-all ${isEquipment ? 'opacity-30 cursor-not-allowed border-zinc-200 dark:border-brand-light text-zinc-400' : (state.hvacIso === 'Sem Isolamento' ? 'bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-950/60 dark:text-rose-200 dark:border-rose-600' : 'bg-transparent border-zinc-200 dark:border-brand-light text-zinc-500')}">Sem Isolamento</button><button ${isEquipment ? 'disabled' : ''} onclick="selectHvacIso('Com Isolamento')" class="py-1.5 px-3 rounded-md border text-xs font-bold transition-all ${isEquipment ? 'opacity-30 cursor-not-allowed border-zinc-200 dark:border-brand-light text-zinc-400' : (state.hvacIso === 'Com Isolamento' ? 'bg-cyan-100 text-cyan-800 border-cyan-300 dark:bg-cyan-950/60 dark:text-cyan-200 dark:border-cyan-600' : 'bg-transparent border-zinc-200 dark:border-brand-light text-zinc-500')}">Com Isolamento</button></div></div><div><span class="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-2 block">5. Finalidade</span><div class="flex flex-col gap-2"><button ${isEquipment ? 'disabled' : ''} onclick="selectHvacConn('jumper')" class="py-1.5 px-3 rounded-md border text-xs font-bold transition-all ${isEquipment ? 'opacity-30 cursor-not-allowed border-zinc-200 dark:border-brand-light text-zinc-400' : (state.hvacConn === 'jumper' ? 'border-brand dark:border-white bg-brand/5 dark:bg-brand-light/30 text-brand dark:text-white' : 'border-zinc-200 dark:border-brand-light text-zinc-400 dark:text-zinc-500')}">Jumper Coletor</button><button ${isEquipment ? 'disabled' : ''} onclick="selectHvacConn('ground')" class="py-1.5 px-3 rounded-md border text-xs font-bold transition-all ${isEquipment ? 'opacity-30 cursor-not-allowed border-zinc-200 dark:border-brand-light text-zinc-400' : (state.hvacConn === 'ground' ? 'border-brand dark:border-white bg-brand/5 dark:bg-brand-light/30 text-brand dark:text-white' : 'border-zinc-200 dark:border-brand-light text-zinc-400 dark:text-zinc-500')}">Geral (Malha)</button></div></div></div>
               <button onclick="openModal('modal-boxes')" class="mt-2 py-3 rounded-lg border border-brand-accent dark:border-brand-light bg-brand-subtle dark:bg-brand-light/20 text-brand dark:text-white text-xs font-black uppercase tracking-widest flex justify-center items-center gap-2 hover:bg-brand-accent hover:text-white transition-colors">Caixas de Aterramento</button>
             </div>
             
             <div class="bg-white dark:bg-brand p-6 rounded-xl border border-zinc-200 dark:border-brand-light shadow-sm space-y-3 mt-auto">
               <div class="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500">Conversor Interativo de Tag</div>
               <div class="grid grid-cols-2 gap-2">
-                <div>
-                  <label class="text-[9px] font-bold text-zinc-400 block mb-1">DMS (6 Dígitos)</label>
-                  <input type="text" id="dms-val-input" value="${state.dmsInput}" oninput="updateDmsTagConversion()" class="w-full bg-slate-50 dark:bg-brand-darker border border-zinc-200 dark:border-brand-light px-2 py-1.5 rounded text-xs font-bold outline-none text-zinc-800 dark:text-white focus:border-brand-accent transition-colors" />
-                </div>
-                <div>
-                  <label class="text-[9px] font-bold text-zinc-400 block mb-1">Tag Base (ID)</label>
-                  <input type="text" id="tag-val-input" value="${state.tagInput}" oninput="updateDmsTagConversion()" class="w-full bg-slate-50 dark:bg-brand-darker border border-zinc-200 dark:border-brand-light px-2 py-1.5 rounded text-xs font-mono outline-none text-zinc-800 dark:text-white focus:border-brand-accent transition-colors" />
-                </div>
+                <div><label class="text-[9px] font-bold text-zinc-400 block mb-1">DMS (6 Dígitos)</label><input type="text" id="dms-val-input" value="${state.dmsInput}" oninput="updateDmsTagConversion()" class="w-full bg-slate-50 dark:bg-brand-darker border border-zinc-200 dark:border-brand-light px-2 py-1.5 rounded text-xs font-bold outline-none text-zinc-800 dark:text-white focus:border-brand-accent transition-colors" /></div>
+                <div><label class="text-[9px] font-bold text-zinc-400 block mb-1">Tag Base (ID)</label><input type="text" id="tag-val-input" value="${state.tagInput}" oninput="updateDmsTagConversion()" class="w-full bg-slate-50 dark:bg-brand-darker border border-zinc-200 dark:border-brand-light px-2 py-1.5 rounded text-xs font-mono outline-none text-zinc-800 dark:text-white focus:border-brand-accent transition-colors" /></div>
               </div>
-              <div class="mt-3 p-3 bg-slate-100 dark:bg-[#0c141d] border border-zinc-300 dark:border-zinc-700 rounded-lg flex items-center justify-between">
-                <span class="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Tag Convertida:</span>
-                <span id="dms-conversion-result" class="text-sm font-mono font-bold text-brand dark:text-brand-accent select-all"></span>
-              </div>
+              <div class="mt-3 p-3 bg-slate-100 dark:bg-[#0c141d] border border-zinc-300 dark:border-zinc-700 rounded-lg flex items-center justify-between"><span class="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Tag Convertida:</span><span id="dms-conversion-result" class="text-sm font-mono font-bold text-brand dark:text-brand-accent select-all"></span></div>
             </div>
-
           </div>
 
           <div class="lg:col-span-6 flex flex-col">
@@ -905,16 +891,9 @@
               <div class="text-center">
                 <span class="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 block mb-4">Resultado de Engenharia</span>
                 <div class="text-5xl font-black text-brand dark:text-white tracking-tighter mb-4">${finalTypical}</div>
-                <button id="hvac-copy-btn" onclick="copyTextToClipboard('${finalTypical}', 'hvac-copy-btn')" class="mx-auto flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-100 dark:bg-brand-darker border border-zinc-200 dark:border-brand-light text-zinc-700 dark:text-zinc-200 text-xs font-bold hover:opacity-80 transition-all">
-                   Copiar Resultado
-                </button>
+                <button id="hvac-copy-btn" onclick="copyTextToClipboard('${finalTypical}', 'hvac-copy-btn')" class="mx-auto flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-100 dark:bg-brand-darker border border-zinc-200 dark:border-brand-light text-zinc-700 dark:text-zinc-200 text-xs font-bold hover:opacity-80 transition-all">Copiar Resultado</button>
               </div>
-              ${svgHTML !== '' ? `
-                <div class="my-2">
-                  <span class="text-[10px] font-black uppercase tracking-wider block mb-2 text-zinc-400 dark:text-zinc-500">Simbologia</span>
-                  ${svgHTML}
-                </div>
-              ` : ''}
+              ${svgHTML !== '' ? `<div class="my-2"><span class="text-[10px] font-black uppercase tracking-wider block mb-2 text-zinc-400 dark:text-zinc-500">Simbologia</span>${svgHTML}</div>` : ''}
             </div>
           </div>
         </div>
@@ -923,7 +902,6 @@
       updateDmsTagConversion();
     }
 
-    // --- BANDEJAS & LEITOS ---
     function selectTrayEnv(env) { state.trayEnv = env; renderTrays(); }
     function selectTrayType(type) { state.trayType = type; renderTrays(); }
     function selectTrayDisc(disc) { state.trayDisc = disc; renderTrays(); }
@@ -933,244 +911,87 @@
     function setTrayE86(modeled) { state.trayE86Modeled = modeled; renderTrays(); }
     function setTrayE86Role(role) { state.trayE86Role = role; renderTrays(); }
 
-    function updateDmsTagConversion() {
-      const dmsInput = document.getElementById('dms-val-input');
-      const tagInput = document.getElementById('tag-val-input');
-      const resultEl = document.getElementById('dms-conversion-result');
-      if (!dmsInput || !tagInput) return;
-      
-      state.dmsInput = dmsInput.value;
-      state.tagInput = tagInput.value;
-      
-      let tag = state.tagInput.replace(/^#/, ''); 
-      let parts = tag.split('-');
-      if (parts.length > 1) {
-        parts[parts.length - 1] = state.dmsInput; 
-        tag = parts.join('-');
-      } else {
-        tag = tag + '-' + state.dmsInput;
-      }
-      
-      if (resultEl) resultEl.textContent = tag;
-    }
-
     function renderTrays() {
       const matched = DB_TRAYS[state.trayDisc][state.trayType];
-
-      let displayTypical = matched.typical;
-      let displayLug = matched.lug;
-      let displayBoss = matched.boss || "E 22";
-      
+      let displayTypical = matched.typical; let displayLug = matched.lug; let displayBoss = matched.boss || "E 22";
       let extraAlertHtml = '';
 
       if (state.earthingType === 'direct') {
-        if (state.trayEnv === 'Indoor') {
-            displayTypical = matched.typical;
-            displayLug = matched.lug;
-            displayBoss = matched.boss;
-        } else {
-           displayTypical = state.trayType === 'Ladder' ? "E 143-D1" : "E 143-D2";
-           displayLug = state.trayDisc === 'Electrical' ? "E 08" : (state.trayType === 'Ladder' ? "E 09" : "E 10");
-           displayBoss = "E 22";
-        }
+        if (state.trayEnv === 'Indoor') { displayTypical = matched.typical; displayLug = matched.lug; displayBoss = matched.boss; } 
+        else { displayTypical = state.trayType === 'Ladder' ? "E 143-D1" : "E 143-D2"; displayLug = state.trayDisc === 'Electrical' ? "E 08" : (state.trayType === 'Ladder' ? "E 09" : "E 10"); displayBoss = "E 22"; }
       } else if (state.earthingType === 'e55') {
-        displayTypical = "E 55-" + state.e55Detail;
-        displayBoss = "E 55";
-        
-        if (state.e55Detail === 'D1') {
-          displayTypical = matched.typical;
-          displayLug = matched.lug;
-        } else if (state.e55Detail === 'D3') {
-          displayLug = state.trayEnv === 'Outdoor' ? (state.trayType === 'Ladder' ? "E 143-D1" : "E 143-D2") : matched.typical;
-          extraAlertHtml = `
-            <div class="mt-4 p-3 rounded-xl border border-indigo-400 bg-indigo-50 dark:bg-[#121c2d] dark:border-[#2b4168] text-left space-y-1 animate-fadeIn shadow-sm">
-              <div class="flex items-center gap-1.5 text-[10px] font-black uppercase text-indigo-700 dark:text-indigo-400">▲ JUMPER DE DERIVAÇÃO (CP)</div>
-              <div class="text-[10px] font-bold text-indigo-800 dark:text-indigo-200 leading-relaxed uppercase">
-                Mapeamento ativo para Derivação a partir do típico ${displayLug}.
-              </div>
-            </div>
-          `;
-        } else if (state.e55Detail === 'D5') {
-          displayLug = "E 108";
-        } else {
-          displayLug = state.trayDisc === 'Electrical' ? (state.e55Detail === 'D2' ? "E 108" : "E 08") : "E 10";
-        }
+        displayTypical = "E 55-" + state.e55Detail; displayBoss = "E 55";
+        if (state.e55Detail === 'D1') { displayTypical = matched.typical; displayLug = matched.lug; } 
+        else if (state.e55Detail === 'D3') { displayLug = state.trayEnv === 'Outdoor' ? (state.trayType === 'Ladder' ? "E 143-D1" : "E 143-D2") : matched.typical; extraAlertHtml = `<div class="mt-4 p-3 rounded-xl border border-indigo-400 bg-indigo-50 dark:bg-[#121c2d] dark:border-[#2b4168] text-left space-y-1 animate-fadeIn shadow-sm"><div class="flex items-center gap-1.5 text-[10px] font-black uppercase text-indigo-700 dark:text-indigo-400">▲ JUMPER DE DERIVAÇÃO (CP)</div><div class="text-[10px] font-bold text-indigo-800 dark:text-indigo-200 leading-relaxed uppercase">Mapeamento ativo para Derivação a partir do típico ${displayLug}.</div></div>`; } 
+        else if (state.e55Detail === 'D5') { displayLug = "E 108"; } 
+        else { displayLug = state.trayDisc === 'Electrical' ? (state.e55Detail === 'D2' ? "E 108" : "E 08") : "E 10"; }
       } else if (state.earthingType === 'special') {
-        if (state.specialType === 'cab_16') {
-          displayTypical = "Terminal E97"; displayLug = "E 97"; displayBoss = "E 22";
-        } else if (state.specialType === 'cab_120') {
-          displayBoss = "E 22";
-          displayTypical = state.trayE86Modeled ? (state.trayE86Role === 'parallel' ? "E86 + TIPO 24" : "EARTHING E86") : "HOLD E86";
-          displayLug = state.trayE86Modeled ? (state.trayE86Role === 'parallel' ? "E 108" : "E 08") : "N/A";
-        }
+        if (state.specialType === 'cab_16') { displayTypical = "Terminal E97"; displayLug = "E 97"; displayBoss = "E 22"; } 
+        else if (state.specialType === 'cab_120') { displayBoss = "E 22"; displayTypical = state.trayE86Modeled ? (state.trayE86Role === 'parallel' ? "E86 + TIPO 24" : "EARTHING E86") : "HOLD E86"; displayLug = state.trayE86Modeled ? (state.trayE86Role === 'parallel' ? "E 108" : "E 08") : "N/A"; }
       }
 
       let cableText = "Cabo 16 mm²";
-      if (displayLug.includes("08")) { 
-          cableText = "Cabo 120 mm²";
-      } else if (displayLug.includes("N/A")) {
-          cableText = "N/A";
-      } else if (displayLug === "Item 225") {
-          cableText = "N/A";
-      }
+      if (displayLug.includes("08")) { cableText = "Cabo 120 mm²"; } else if (displayLug.includes("N/A") || displayLug === "Item 225") { cableText = "N/A"; }
 
       let html = `
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-fadeIn">
-          
           <div class="lg:col-span-6 space-y-6 flex flex-col">
             <div class="bg-white dark:bg-brand p-6 rounded-xl border border-zinc-200 dark:border-brand-light shadow-sm flex flex-col gap-6">
-              
               <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <span class="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-2 block">1. Ambiente</span>
-                  <div class="flex flex-col gap-2">
-                    <button onclick="selectTrayEnv('Indoor')" class="py-2 px-3 rounded-lg text-xs font-bold transition-all border ${state.trayEnv === 'Indoor' ? 'bg-zinc-800 dark:bg-zinc-200 text-white dark:text-brand border-transparent shadow' : 'bg-slate-50 dark:bg-brand-darker text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-brand-light'}">INDOOR</button>
-                    <button onclick="selectTrayEnv('Outdoor')" class="py-2 px-3 rounded-lg text-xs font-bold transition-all border ${state.trayEnv === 'Outdoor' ? 'bg-zinc-800 dark:bg-zinc-200 text-white dark:text-brand border-transparent shadow' : 'bg-slate-50 dark:bg-brand-darker text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-brand-light'}">OUTDOOR</button>
-                  </div>
-                </div>
-                <div>
-                  <span class="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-2 block">2. Disciplina</span>
-                  <div class="flex flex-col gap-2">
-                    <button onclick="selectTrayDisc('Electrical')" class="py-2 rounded-md text-xs font-black uppercase transition-all border ${state.trayDisc === 'Electrical' ? 'bg-orange-500 text-white border-orange-500 shadow-md' : 'bg-slate-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-500'}">ELÉTRICA</button>
-                    <button onclick="selectTrayDisc('Instrumental')" class="py-2 rounded-md text-xs font-black uppercase transition-all border ${state.trayDisc === 'Instrumental' ? 'bg-blue-500 text-white border-blue-500 shadow-md' : 'bg-slate-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-500'}">INSTRUMENTAÇÃO</button>
-                    <button onclick="selectTrayDisc('Lighting')" class="py-2 rounded-md text-xs font-black uppercase transition-all border ${state.trayDisc === 'Lighting' ? 'bg-zinc-500 text-white border-zinc-500 shadow-md' : 'bg-slate-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-500'}">ILUMINAÇÃO</button>
-                  </div>
-                </div>
+                <div><span class="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-2 block">1. Ambiente</span><div class="flex flex-col gap-2"><button onclick="selectTrayEnv('Indoor')" class="py-2 px-3 rounded-lg text-xs font-bold transition-all border ${state.trayEnv === 'Indoor' ? 'bg-zinc-800 dark:bg-zinc-200 text-white dark:text-brand border-transparent shadow' : 'bg-slate-50 dark:bg-brand-darker text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-brand-light'}">INDOOR</button><button onclick="selectTrayEnv('Outdoor')" class="py-2 px-3 rounded-lg text-xs font-bold transition-all border ${state.trayEnv === 'Outdoor' ? 'bg-zinc-800 dark:bg-zinc-200 text-white dark:text-brand border-transparent shadow' : 'bg-slate-50 dark:bg-brand-darker text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-brand-light'}">OUTDOOR</button></div></div>
+                <div><span class="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-2 block">2. Disciplina</span><div class="flex flex-col gap-2"><button onclick="selectTrayDisc('Electrical')" class="py-2 rounded-md text-xs font-black uppercase transition-all border ${state.trayDisc === 'Electrical' ? 'bg-orange-500 text-white border-orange-500 shadow-md' : 'bg-slate-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-500'}">ELÉTRICA</button><button onclick="selectTrayDisc('Instrumental')" class="py-2 rounded-md text-xs font-black uppercase transition-all border ${state.trayDisc === 'Instrumental' ? 'bg-blue-500 text-white border-blue-500 shadow-md' : 'bg-slate-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-500'}">INSTRUMENTAÇÃO</button><button onclick="selectTrayDisc('Lighting')" class="py-2 rounded-md text-xs font-black uppercase transition-all border ${state.trayDisc === 'Lighting' ? 'bg-zinc-500 text-white border-zinc-500 shadow-md' : 'bg-slate-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-500'}">ILUMINAÇÃO</button></div></div>
               </div>
-
               <div>
-                <span class="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-2 block">3. Tipo de Suporte</span>
-                <div class="grid grid-cols-2 gap-2">
-                  <button onclick="selectTrayType('Ladder')" class="py-2 px-2 rounded-xl border text-center transition-all ${state.trayType === 'Ladder' ? 'border-brand-accent dark:border-white bg-brand/5 dark:bg-brand-light/30 text-brand dark:text-white shadow-sm' : 'border-zinc-200 dark:border-brand-light text-zinc-400 dark:text-zinc-500 bg-slate-50 dark:bg-brand-darker'}">
-                    <div class="font-black text-sm">LADDER</div><div class="text-[10px]">H &ge; 100mm</div>
-                  </button>
-                  <button onclick="selectTrayType('Tray')" class="py-2 px-2 rounded-xl border text-center transition-all ${state.trayType === 'Tray' ? 'border-brand-accent dark:border-white bg-brand/5 dark:bg-brand-light/30 text-brand dark:text-white shadow-sm' : 'border-zinc-200 dark:border-brand-light text-zinc-400 dark:text-zinc-500 bg-slate-50 dark:bg-brand-darker'}">
-                    <div class="font-black text-sm">TRAY</div><div class="text-[10px]">H &lt; 100mm</div>
-                  </button>
-                </div>
+                <span class="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-2 block">3. Tipo de Suporte</span><div class="grid grid-cols-2 gap-2"><button onclick="selectTrayType('Ladder')" class="py-2 px-2 rounded-xl border text-center transition-all ${state.trayType === 'Ladder' ? 'border-brand-accent dark:border-white bg-brand/5 dark:bg-brand-light/30 text-brand dark:text-white shadow-sm' : 'border-zinc-200 dark:border-brand-light text-zinc-400 dark:text-zinc-500 bg-slate-50 dark:bg-brand-darker'}"><div class="font-black text-sm">LADDER</div><div class="text-[10px]">H &ge; 100mm</div></button><button onclick="selectTrayType('Tray')" class="py-2 px-2 rounded-xl border text-center transition-all ${state.trayType === 'Tray' ? 'border-brand-accent dark:border-white bg-brand/5 dark:bg-brand-light/30 text-brand dark:text-white shadow-sm' : 'border-zinc-200 dark:border-brand-light text-zinc-400 dark:text-zinc-500 bg-slate-50 dark:bg-brand-darker'}"><div class="font-black text-sm">TRAY</div><div class="text-[10px]">H &lt; 100mm</div></button></div>
               </div>
-
               <div class="pt-4 border-t border-zinc-200 dark:border-brand-light">
-                <div class="flex justify-between items-center mb-3">
-                  <span class="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500">4. Tipo de Conexão</span>
-                </div>
+                <div class="flex justify-between items-center mb-3"><span class="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500">4. Tipo de Conexão</span></div>
                 <div class="flex flex-col gap-2">
-                  <button onclick="selectEarthingType('direct')" class="py-3 px-4 rounded-lg text-xs font-bold transition-all text-left border ${state.earthingType === 'direct' ? 'bg-zinc-800 dark:bg-zinc-200 text-white dark:text-brand border-transparent shadow' : 'bg-slate-50 dark:bg-brand-darker text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-brand-light hover:bg-zinc-100'}">
-                    1. Aterramento Direto Padrão
-                  </button>
-                  
-                  <button onclick="selectEarthingType('e55')" class="py-3 px-4 rounded-lg text-xs font-bold transition-all text-left border ${state.earthingType === 'e55' ? 'bg-emerald-600 text-white border-transparent shadow' : 'bg-slate-50 dark:bg-brand-darker text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-brand-light hover:bg-zinc-100'}">
-                    2. Jumpers / Derivação / Main Wire (Série E 55)
-                  </button>
-
-                  ${state.earthingType === 'e55' ? `
-                    <div class="pl-4 pr-2 py-3 bg-emerald-50 dark:bg-[#0c2417] border-l-4 border-emerald-500 rounded-r-lg space-y-2 mb-2 animate-fadeIn">
-                      <span class="text-[9px] font-black text-emerald-800 dark:text-emerald-400 uppercase tracking-wider block mb-2">Detalhes E55:</span>
-                      <button onclick="selectE55Detail('D1')" class="w-full text-left py-1.5 px-3 rounded text-xs font-semibold transition-all ${state.e55Detail === 'D1' ? 'bg-emerald-200 dark:bg-emerald-800 text-emerald-900 dark:text-emerald-100' : 'text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/50'}">D1 - Padrão Ladder</button>
-                      <button onclick="selectE55Detail('D2')" class="w-full text-left py-1.5 px-3 rounded text-xs font-semibold transition-all ${state.e55Detail === 'D2' ? 'bg-emerald-200 dark:bg-emerald-800 text-emerald-900 dark:text-emerald-100' : 'text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/50'}">D2 - Tray 40mm / Main Cable</button>
-                      <button onclick="selectE55Detail('D3')" class="w-full text-left py-1.5 px-3 rounded text-xs font-semibold transition-all ${state.e55Detail === 'D3' ? 'bg-indigo-600 text-white shadow-md' : 'text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/50'}">D3 - Derivação (Jumper CP)</button>
-                      <button onclick="selectE55Detail('D4')" class="w-full text-left py-1.5 px-3 rounded text-xs font-semibold transition-all ${state.e55Detail === 'D4' ? 'bg-emerald-200 dark:bg-emerald-800 text-emerald-900 dark:text-emerald-100' : 'text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/50'}">D4 - Tray 60mm</button>
-                      <button onclick="selectE55Detail('D5')" class="w-full text-left py-1.5 px-3 rounded text-xs font-semibold transition-all ${state.e55Detail === 'D5' ? 'bg-emerald-200 dark:bg-emerald-800 text-emerald-900 dark:text-emerald-100' : 'text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/50'}">D5 - Main Parallel Wire (Start)</button>
-                    </div>
-                  ` : ''}
-
-                  <button onclick="selectEarthingType('special')" class="py-3 px-4 rounded-lg text-xs font-bold transition-all text-left border ${state.earthingType === 'special' ? 'bg-amber-500 text-white border-transparent shadow' : 'bg-slate-50 dark:bg-brand-darker text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-brand-light hover:bg-zinc-100'}">
-                    3. Conexões Especiais
-                  </button>
-
-                  ${state.earthingType === 'special' ? `
-                    <div class="pl-4 pr-2 py-3 bg-amber-50 dark:bg-[#2b1d0c] border-l-4 border-amber-500 rounded-r-lg space-y-3 mb-2 animate-fadeIn">
-                      <div class="grid grid-cols-2 gap-2">
-                        <button onclick="selectSpecialType('cab_16')" class="py-2 rounded text-[10px] font-bold transition-all ${state.specialType === 'cab_16' ? 'bg-amber-200 dark:bg-amber-800 text-amber-900 dark:text-amber-100' : 'bg-amber-100/50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 hover:bg-amber-200/50'}">Terminal BUSBAR</button>
-                        <button onclick="selectSpecialType('cab_120')" class="py-2 rounded text-[10px] font-bold transition-all ${state.specialType === 'cab_120' ? 'bg-amber-200 dark:bg-amber-800 text-amber-900 dark:text-amber-100' : 'bg-amber-100/50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 hover:bg-amber-200/50'}">Cabo 120mm² (E86)</button>
-                      </div>
-                      ${state.specialType === 'cab_120' ? `
-                        <div class="space-y-1.5 border-t border-amber-200/50 dark:border-amber-800/50 pt-2">
-                          <span class="text-[9px] font-bold text-amber-800 dark:text-amber-500">O PINO E86 ESTÁ MODELADO NO 3D?</span>
-                          <div class="grid grid-cols-2 gap-2">
-                            <button onclick="setTrayE86(true)" class="py-1 rounded text-[10px] font-bold transition-all border ${state.trayE86Modeled ? 'bg-amber-600 text-white border-transparent' : 'bg-transparent border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-400'}">Sim</button>
-                            <button onclick="setTrayE86(false)" class="py-1 rounded text-[10px] font-bold transition-all border ${!state.trayE86Modeled ? 'bg-rose-600 text-white border-transparent' : 'bg-transparent border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-400'}">Não (HOLD)</button>
-                          </div>
-                        </div>
-                      ` : ''}
-                    </div>
-                  ` : ''}
+                  <button onclick="selectEarthingType('direct')" class="py-3 px-4 rounded-lg text-xs font-bold transition-all text-left border ${state.earthingType === 'direct' ? 'bg-zinc-800 dark:bg-zinc-200 text-white dark:text-brand border-transparent shadow' : 'bg-slate-50 dark:bg-brand-darker text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-brand-light hover:bg-zinc-100'}">1. Aterramento Direto Padrão</button>
+                  <button onclick="selectEarthingType('e55')" class="py-3 px-4 rounded-lg text-xs font-bold transition-all text-left border ${state.earthingType === 'e55' ? 'bg-emerald-600 text-white border-transparent shadow' : 'bg-slate-50 dark:bg-brand-darker text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-brand-light hover:bg-zinc-100'}">2. Jumpers / Derivação / Main Wire (Série E 55)</button>
+                  ${state.earthingType === 'e55' ? `<div class="pl-4 pr-2 py-3 bg-emerald-50 dark:bg-[#0c2417] border-l-4 border-emerald-500 rounded-r-lg space-y-2 mb-2 animate-fadeIn"><span class="text-[9px] font-black text-emerald-800 dark:text-emerald-400 uppercase tracking-wider block mb-2">Detalhes E55:</span><button onclick="selectE55Detail('D1')" class="w-full text-left py-1.5 px-3 rounded text-xs font-semibold transition-all ${state.e55Detail === 'D1' ? 'bg-emerald-200 dark:bg-emerald-800 text-emerald-900 dark:text-emerald-100' : 'text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/50'}">D1 - Padrão Ladder</button><button onclick="selectE55Detail('D2')" class="w-full text-left py-1.5 px-3 rounded text-xs font-semibold transition-all ${state.e55Detail === 'D2' ? 'bg-emerald-200 dark:bg-emerald-800 text-emerald-900 dark:text-emerald-100' : 'text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/50'}">D2 - Tray 40mm / Main Cable</button><button onclick="selectE55Detail('D3')" class="w-full text-left py-1.5 px-3 rounded text-xs font-semibold transition-all ${state.e55Detail === 'D3' ? 'bg-indigo-600 text-white shadow-md' : 'text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/50'}">D3 - Derivação (Jumper CP)</button><button onclick="selectE55Detail('D4')" class="w-full text-left py-1.5 px-3 rounded text-xs font-semibold transition-all ${state.e55Detail === 'D4' ? 'bg-emerald-200 dark:bg-emerald-800 text-emerald-900 dark:text-emerald-100' : 'text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/50'}">D4 - Tray 60mm</button><button onclick="selectE55Detail('D5')" class="w-full text-left py-1.5 px-3 rounded text-xs font-semibold transition-all ${state.e55Detail === 'D5' ? 'bg-emerald-200 dark:bg-emerald-800 text-emerald-900 dark:text-emerald-100' : 'text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/50'}">D5 - Main Parallel Wire (Start)</button></div>` : ''}
+                  <button onclick="selectEarthingType('special')" class="py-3 px-4 rounded-lg text-xs font-bold transition-all text-left border ${state.earthingType === 'special' ? 'bg-amber-500 text-white border-transparent shadow' : 'bg-slate-50 dark:bg-brand-darker text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-brand-light hover:bg-zinc-100'}">3. Conexões Especiais</button>
+                  ${state.earthingType === 'special' ? `<div class="pl-4 pr-2 py-3 bg-amber-50 dark:bg-[#2b1d0c] border-l-4 border-amber-500 rounded-r-lg space-y-3 mb-2 animate-fadeIn"><div class="grid grid-cols-2 gap-2"><button onclick="selectSpecialType('cab_16')" class="py-2 rounded text-[10px] font-bold transition-all ${state.specialType === 'cab_16' ? 'bg-amber-200 dark:bg-amber-800 text-amber-900 dark:text-amber-100' : 'bg-amber-100/50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 hover:bg-amber-200/50'}">Terminal BUSBAR</button><button onclick="selectSpecialType('cab_120')" class="py-2 rounded text-[10px] font-bold transition-all ${state.specialType === 'cab_120' ? 'bg-amber-200 dark:bg-amber-800 text-amber-900 dark:text-amber-100' : 'bg-amber-100/50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 hover:bg-amber-200/50'}">Cabo 120mm² (E86)</button></div>${state.specialType === 'cab_120' ? `<div class="space-y-1.5 border-t border-amber-200/50 dark:border-amber-800/50 pt-2"><span class="text-[9px] font-bold text-amber-800 dark:text-amber-500">O PINO E86 ESTÁ MODELADO NO 3D?</span><div class="grid grid-cols-2 gap-2"><button onclick="setTrayE86(true)" class="py-1 rounded text-[10px] font-bold transition-all border ${state.trayE86Modeled ? 'bg-amber-600 text-white border-transparent' : 'bg-transparent border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-400'}">Sim</button><button onclick="setTrayE86(false)" class="py-1 rounded text-[10px] font-bold transition-all border ${!state.trayE86Modeled ? 'bg-rose-600 text-white border-transparent' : 'bg-transparent border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-400'}">Não (HOLD)</button></div></div>` : ''}</div>` : ''}
                 </div>
               </div>
-              
-              <button onclick="openModal('modal-boxes')" class="mt-4 w-full py-3 rounded-lg border border-brand-accent dark:border-brand-light bg-brand-subtle dark:bg-brand-light/20 text-brand dark:text-white text-xs font-black uppercase tracking-widest flex justify-center items-center gap-2 hover:bg-brand-accent hover:text-white transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                Caixas de Aterramento
-              </button>
-
+              <button onclick="openModal('modal-boxes')" class="mt-4 w-full py-3 rounded-lg border border-brand-accent dark:border-brand-light bg-brand-subtle dark:bg-brand-light/20 text-brand dark:text-white text-xs font-black uppercase tracking-widest flex justify-center items-center gap-2 hover:bg-brand-accent hover:text-white transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg> Caixas de Aterramento</button>
             </div>
             
             <div class="bg-white dark:bg-brand p-6 rounded-xl border border-zinc-200 dark:border-brand-light shadow-sm space-y-3 mt-auto">
               <div class="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500">Conversor Interativo de Tag</div>
               <div class="grid grid-cols-2 gap-2">
-                <div>
-                  <label class="text-[9px] font-bold text-zinc-400 block mb-1">DMS (6 Dígitos)</label>
-                  <input type="text" id="dms-val-input" value="${state.dmsInput}" oninput="updateDmsTagConversion()" class="w-full bg-slate-50 dark:bg-brand-darker border border-zinc-200 dark:border-brand-light px-2 py-1.5 rounded text-xs font-bold outline-none text-zinc-800 dark:text-white focus:border-brand-accent transition-colors" />
-                </div>
-                <div>
-                  <label class="text-[9px] font-bold text-zinc-400 block mb-1">Tag Base (ID)</label>
-                  <input type="text" id="tag-val-input" value="${state.tagInput}" oninput="updateDmsTagConversion()" class="w-full bg-slate-50 dark:bg-brand-darker border border-zinc-200 dark:border-brand-light px-2 py-1.5 rounded text-xs font-mono outline-none text-zinc-800 dark:text-white focus:border-brand-accent transition-colors" />
-                </div>
+                <div><label class="text-[9px] font-bold text-zinc-400 block mb-1">DMS (6 Dígitos)</label><input type="text" id="dms-val-input" value="${state.dmsInput}" oninput="updateDmsTagConversion()" class="w-full bg-slate-50 dark:bg-brand-darker border border-zinc-200 dark:border-brand-light px-2 py-1.5 rounded text-xs font-bold outline-none text-zinc-800 dark:text-white focus:border-brand-accent transition-colors" /></div>
+                <div><label class="text-[9px] font-bold text-zinc-400 block mb-1">Tag Base (ID)</label><input type="text" id="tag-val-input" value="${state.tagInput}" oninput="updateDmsTagConversion()" class="w-full bg-slate-50 dark:bg-brand-darker border border-zinc-200 dark:border-brand-light px-2 py-1.5 rounded text-xs font-mono outline-none text-zinc-800 dark:text-white focus:border-brand-accent transition-colors" /></div>
               </div>
-              <div class="mt-3 p-3 bg-slate-100 dark:bg-[#0c141d] border border-zinc-300 dark:border-zinc-700 rounded-lg flex items-center justify-between">
-                <span class="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Tag Convertida:</span>
-                <span id="dms-conversion-result" class="text-sm font-mono font-bold text-brand dark:text-brand-accent select-all"></span>
-              </div>
+              <div class="mt-3 p-3 bg-slate-100 dark:bg-[#0c141d] border border-zinc-300 dark:border-zinc-700 rounded-lg flex items-center justify-between"><span class="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Tag Convertida:</span><span id="dms-conversion-result" class="text-sm font-mono font-bold text-brand dark:text-brand-accent select-all"></span></div>
             </div>
           </div>
 
           <div class="lg:col-span-6 flex flex-col">
             <div class="bg-white dark:bg-brand p-6 rounded-xl border border-zinc-200 dark:border-brand-light shadow-sm flex flex-col justify-center h-full min-h-[300px] gap-6">
-              
               <div class="text-center">
                 <span class="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 block mb-4">Resultado de Engenharia</span>
                 <div class="text-4xl lg:text-5xl font-black text-brand dark:text-white tracking-tighter mb-4">${displayTypical}</div>
-                
                 <div class="flex justify-center gap-3 mb-6">
-                  <div class="flex flex-col items-center bg-slate-50 dark:bg-brand-darker border border-zinc-200 dark:border-brand-light px-4 py-2 rounded-lg min-w-[100px] shadow-sm">
-                    <span class="text-[9px] font-black uppercase text-zinc-400">LUG (Conector)</span>
-                    <span class="text-sm font-bold text-brand dark:text-brand-accent">${displayLug}</span>
-                  </div>
-                  <div class="flex flex-col items-center bg-slate-50 dark:bg-brand-darker border border-zinc-200 dark:border-brand-light px-4 py-2 rounded-lg min-w-[100px] shadow-sm">
-                    <span class="text-[9px] font-black uppercase text-zinc-400">Tipo de Cabo</span>
-                    <span class="text-sm font-bold text-brand dark:text-brand-accent">${cableText}</span>
-                  </div>
+                  <div class="flex flex-col items-center bg-slate-50 dark:bg-brand-darker border border-zinc-200 dark:border-brand-light px-4 py-2 rounded-lg min-w-[100px] shadow-sm"><span class="text-[9px] font-black uppercase text-zinc-400">LUG (Conector)</span><span class="text-sm font-bold text-brand dark:text-brand-accent">${displayLug}</span></div>
+                  <div class="flex flex-col items-center bg-slate-50 dark:bg-brand-darker border border-zinc-200 dark:border-brand-light px-4 py-2 rounded-lg min-w-[100px] shadow-sm"><span class="text-[9px] font-black uppercase text-zinc-400">Tipo de Cabo</span><span class="text-sm font-bold text-brand dark:text-brand-accent">${cableText}</span></div>
                 </div>
-
-                <button id="trays-copy-btn" onclick="copyTextToClipboard('${displayTypical}', 'trays-copy-btn')" class="mx-auto flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-100 dark:bg-brand-darker border border-zinc-200 dark:border-brand-light text-zinc-700 dark:text-zinc-200 text-xs font-bold hover:opacity-80 transition-all">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar Típico
-                </button>
+                <button id="trays-copy-btn" onclick="copyTextToClipboard('${displayTypical}', 'trays-copy-btn')" class="mx-auto flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-100 dark:bg-brand-darker border border-zinc-200 dark:border-brand-light text-zinc-700 dark:text-zinc-200 text-xs font-bold hover:opacity-80 transition-all"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar Típico</button>
                 ${extraAlertHtml}
               </div>
-
             </div>
           </div>
         </div>
         
-        <!-- BOTOES FLUTUANTES (WORK AID E GUIA VISUAL) -->
+        <!-- BOTÕES FLUTUANTES (Exibidos APENAS nas abas de Bandejas) -->
         <div class="fixed bottom-6 right-6 z-40 flex flex-col gap-3 no-print">
             <button onclick="openModal('modal-work-aid')" class="bg-orange-600 hover:bg-orange-700 text-white rounded-full w-14 h-14 shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.2)] transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center group border border-orange-400 outline-none">
               <span class="font-black text-xl">WA</span>
-              <span class="absolute right-full mr-4 bg-zinc-800 text-white text-[10px] font-black uppercase tracking-widest px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap pointer-events-none shadow-md border border-zinc-700">
-                Work Aid Guide
-              </span>
+              <span class="absolute right-full mr-4 bg-zinc-800 text-white text-[10px] font-black uppercase tracking-widest px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap pointer-events-none shadow-md border border-zinc-700">Work Aid Guide</span>
             </button>
-            
             <button onclick="openModal('modal-visual-guide')" class="bg-brand hover:bg-brand-light dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white rounded-full w-14 h-14 shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.2)] transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center group border border-brand-light dark:border-indigo-400 outline-none">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="12" y1="4" x2="12" y2="14"/>
-                <line x1="4" y1="14" x2="20" y2="14"/>
-                <line x1="8" y1="18" x2="16" y2="18"/>
-                <line x1="11" y1="22" x2="13" y2="22"/>
-              </svg>
-              <span class="absolute right-full mr-4 bg-zinc-800 text-white text-[10px] font-black uppercase tracking-widest px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap pointer-events-none shadow-md border border-zinc-700">
-                Guia de Símbolos
-              </span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="4" x2="12" y2="14"/><line x1="4" y1="14" x2="20" y2="14"/><line x1="8" y1="18" x2="16" y2="18"/><line x1="11" y1="22" x2="13" y2="22"/></svg>
+              <span class="absolute right-full mr-4 bg-zinc-800 text-white text-[10px] font-black uppercase tracking-widest px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap pointer-events-none shadow-md border border-zinc-700">Guia de Símbolos</span>
             </button>
         </div>
       `;
@@ -1178,11 +999,320 @@
       updateDmsTagConversion(); 
     }
 
+
+    // -------------------------------------------------------------
+    // LOGICA DO NOVO SUB-APP DE KPIs & ANALYTICS (Modal Independente)
+    // -------------------------------------------------------------
+    function openKpiApp() {
+        const modal = document.getElementById('modal-kpi-app');
+        const content = document.getElementById('kpi-modal-content');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            content.classList.remove('scale-95');
+        }, 10);
+        renderKpiRegisterChecklist();
+    }
+
+    function closeKpiApp() {
+        const modal = document.getElementById('modal-kpi-app');
+        const content = document.getElementById('kpi-modal-content');
+        modal.classList.add('opacity-0');
+        content.classList.add('scale-95');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }, 300);
+    }
+
+    function switchKpiTab(tabId) {
+        if(tabId === 'reg') {
+            document.getElementById('kpi-tab-reg').classList.remove('hidden');
+            document.getElementById('kpi-tab-dash').classList.add('hidden');
+            document.getElementById('kpi-tab-btn-reg').classList.add('border-rose-600', 'text-rose-600');
+            document.getElementById('kpi-tab-btn-reg').classList.remove('border-transparent', 'text-zinc-500');
+            document.getElementById('kpi-tab-btn-dash').classList.remove('border-rose-600', 'text-rose-600');
+            document.getElementById('kpi-tab-btn-dash').classList.add('border-transparent', 'text-zinc-500');
+        } else {
+            document.getElementById('kpi-tab-reg').classList.add('hidden');
+            document.getElementById('kpi-tab-dash').classList.remove('hidden');
+            document.getElementById('kpi-tab-btn-dash').classList.add('border-rose-600', 'text-rose-600');
+            document.getElementById('kpi-tab-btn-dash').classList.remove('border-transparent', 'text-zinc-500');
+            document.getElementById('kpi-tab-btn-reg').classList.remove('border-rose-600', 'text-rose-600');
+            document.getElementById('kpi-tab-btn-reg').classList.add('border-transparent', 'text-zinc-500');
+            renderKpiDashboard();
+        }
+    }
+
+    // Renderiza a lista EXATA do checklist mestre
+    function renderKpiRegisterChecklist() {
+        const container = document.getElementById('kpi-form-checklist');
+        if(!container) return;
+        
+        let html = '';
+        CHECKLIST_DATA.forEach(cat => {
+            html += `
+                <div class="col-span-1">
+                    <h4 class="font-black text-[10px] uppercase text-zinc-500 dark:text-zinc-400 mt-4 mb-3 tracking-widest border-b border-zinc-200 dark:border-brand-light pb-1">${cat.category}</h4>
+                    <div class="space-y-2">
+            `;
+            cat.items.forEach(item => {
+                html += `
+                    <label class="flex items-start gap-3 p-3 rounded-lg border border-zinc-200 dark:border-brand-light bg-white dark:bg-brand cursor-pointer hover:border-rose-300 dark:hover:border-rose-700 transition-all group">
+                        <input type="checkbox" id="kpi-chk-${item.id}" value="${item.id}" class="kpi-check shrink-0 mt-0.5 w-4 h-4 rounded border-zinc-300 text-rose-600 focus:ring-rose-500 dark:border-brand-light dark:bg-brand-darker bg-zinc-100 transition-all">
+                        <span class="text-xs font-semibold text-zinc-700 dark:text-zinc-200 group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors leading-relaxed">${item.text}</span>
+                    </label>
+                `;
+            });
+            html += `</div></div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    // Integração com Banco de Dados Nuvem / Formulário via Webhook (Google Apps Script)
+    async function sendDataToCloud(record) {
+        if (!CLOUD_WEBHOOK_URL) return; // Funciona offline se a URL estiver vazia
+        try {
+            await fetch(CLOUD_WEBHOOK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(record),
+                mode: 'no-cors' // Evita erros de CORS do GitHub Pages para Apps Script
+            });
+        } catch (error) {
+            console.error("Falha ao sincronizar com a nuvem:", error);
+        }
+    }
+
+    function saveKpiRecord() {
+        const weekEl = document.getElementById('kpi-week');
+        const roomEl = document.getElementById('kpi-room');
+        const sheetsEl = document.getElementById('kpi-sheets');
+        
+        if(!weekEl.value || !roomEl.value.trim()) {
+            alert("Erro: O preenchimento do Nome da Sala é obrigatório.");
+            roomEl.classList.add('border-rose-500');
+            return;
+        }
+        roomEl.classList.remove('border-rose-500');
+
+        const errors = [];
+        CHECKLIST_DATA.forEach(cat => {
+            cat.items.forEach(item => {
+                const chk = document.getElementById(`kpi-chk-${item.id}`);
+                if(chk && chk.checked) errors.push(item.id);
+            });
+        });
+
+        const record = {
+            id: `REC_${Date.now()}`,
+            week: weekEl.value,
+            room: roomEl.value.trim().toUpperCase(),
+            sheets: sheetsEl.value ? parseInt(sheetsEl.value) : 0,
+            errors: errors,
+            timestamp: new Date().toISOString()
+        };
+
+        // Salva Localmente (Para uso próprio do Dashboard)
+        kpiDataEngine.push(record);
+        
+        try {
+            localStorage.setItem('CQ_KPI_Data_Engine', JSON.stringify(kpiDataEngine));
+            
+            // Envia para Nuvem Assincronamente (P/ Consolidar Várias Pessoas num "Forms")
+            sendDataToCloud(record);
+
+            roomEl.value = '';
+            sheetsEl.value = '';
+            CHECKLIST_DATA.forEach(cat => cat.items.forEach(item => {
+                const chk = document.getElementById(`kpi-chk-${item.id}`);
+                if(chk) chk.checked = false;
+            }));
+            alert(`✅ Auditoria da sala ${record.room} salva com sucesso! (${record.errors.length} erros mapeados)`);
+        } catch(e) {
+            console.error("Storage Error:", e);
+            alert("Erro ao salvar no cache do navegador.");
+        }
+    }
+
+    function deleteKpiRecord(recordId) {
+        if(confirm('Deseja excluir permanentemente o registro desta sala?')) {
+            kpiDataEngine = kpiDataEngine.filter(r => r.id !== recordId);
+            localStorage.setItem('CQ_KPI_Data_Engine', JSON.stringify(kpiDataEngine));
+            renderKpiDashboard(); // Atualiza a tela imediatamente
+        }
+    }
+
+    // Botão Limpar Memória (Apaga tudo do LocalStorage no App KPI)
+    function clearKpiMemory() {
+        if(confirm("ATENÇÃO: Tem certeza que deseja APAGAR TODAS as salas salvas na memória deste navegador? (Isso resetará todos os gráficos locais)")) {
+            kpiDataEngine = [];
+            localStorage.removeItem('CQ_KPI_Data_Engine');
+            renderKpiDashboard();
+        }
+    }
+
+    // Renderiza o Dashboard com Gráfico Horizontal Limpo
+    function renderKpiDashboard() {
+        const filter = document.getElementById('kpi-filter-week').value;
+        let filtered = filter === 'ALL' ? kpiDataEngine : kpiDataEngine.filter(r => r.week === filter);
+
+        const totalRooms = filtered.length;
+        let totalErrors = 0;
+        
+        // Estrutura p/ contagem
+        const errorCounts = {};
+        CHECKLIST_DATA.forEach(cat => cat.items.forEach(i => errorCounts[i.id] = { text: i.text, count: 0 }));
+        
+        filtered.forEach(record => {
+            totalErrors += record.errors.length;
+            record.errors.forEach(errId => {
+                if(errorCounts[errId]) errorCounts[errId].count++;
+            });
+        });
+
+        document.getElementById('kpi-stat-rooms').innerText = totalRooms;
+        document.getElementById('kpi-stat-errors').innerText = totalErrors;
+        document.getElementById('kpi-stat-avg').innerText = totalRooms > 0 ? (totalErrors/totalRooms).toFixed(1) : '0.0';
+
+        // Atualizar Tabela de Memória (Salas Salvas)
+        const memoryTable = document.getElementById('kpi-memory-table');
+        if (totalRooms === 0) {
+            memoryTable.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-zinc-400 italic">Nenhuma sala registrada neste filtro temporal.</td></tr>`;
+        } else {
+            let tableHtml = '';
+            filtered.forEach(r => {
+                tableHtml += `
+                <tr class="border-b border-zinc-100 dark:border-brand-light hover:bg-slate-50 dark:hover:bg-brand-light/20 transition-colors">
+                    <td class="p-3">${r.week}</td>
+                    <td class="p-3 font-bold text-brand dark:text-white">${r.room}</td>
+                    <td class="p-3 text-center">${r.sheets}</td>
+                    <td class="p-3 text-center font-bold text-rose-600 dark:text-rose-400">${r.errors.length}</td>
+                    <td class="p-3 text-center">
+                        <button onclick="deleteKpiRecord('${r.id}')" class="text-[10px] uppercase font-black tracking-widest text-zinc-400 hover:text-rose-600 transition-colors">Excluir</button>
+                    </td>
+                </tr>`;
+            });
+            memoryTable.innerHTML = tableHtml;
+        }
+
+        // Gráfico Bar Vertical (Chart.js) estilo Excel
+        const labels = [];
+        const dataPoints = [];
+        
+        // Mantem a ordem do array CHECKLIST_DATA
+        CHECKLIST_DATA.forEach(cat => {
+            cat.items.forEach(item => {
+                let txt = item.text.length > 35 ? item.text.substring(0, 35) + '...' : item.text;
+                labels.push(txt);
+                let pct = totalRooms > 0 ? Math.round((errorCounts[item.id].count / totalRooms) * 100) : 0;
+                dataPoints.push(pct);
+            });
+        });
+
+        const ctx = document.getElementById('kpiChartCanvas').getContext('2d');
+        if (kpiChartInstance) {
+            kpiChartInstance.destroy();
+        }
+
+        kpiChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: '% do Total de Erros',
+                    data: dataPoints,
+                    backgroundColor: '#4f81bd', // Cor Azul estilo Excel
+                    borderColor: '#385d8a',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Porcentagem de Erros por Item',
+                        font: { size: 18, family: 'Inter', weight: 'bold' },
+                        color: state.darkMode ? '#fff' : '#000',
+                        padding: { bottom: 20 }
+                    },
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            boxWidth: 12,
+                            color: state.darkMode ? '#cbd5e1' : '#334155'
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.raw + '% de Frequência';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        title: { display: true, text: '% do Total de Erros', font: { weight: 'bold' }, color: state.darkMode ? '#cbd5e1' : '#334155' },
+                        ticks: {
+                            stepSize: 10,
+                            callback: function(value) { return value + '%'; },
+                            color: state.darkMode ? '#cbd5e1' : '#334155'
+                        },
+                        grid: {
+                            color: state.darkMode ? '#003e57' : '#e2e8f0'
+                        }
+                    },
+                    x: {
+                        title: { display: true, text: 'Itens do Checklist', font: { weight: 'bold' }, color: state.darkMode ? '#cbd5e1' : '#334155' },
+                        ticks: {
+                            maxRotation: 45,
+                            minRotation: 45,
+                            font: { size: 10 },
+                            color: state.darkMode ? '#cbd5e1' : '#334155'
+                        },
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+    }
+
+    function exportKpiCSV() {
+        if(kpiDataEngine.length === 0) return alert("Sem dados para exportar.");
+        let allIds = [];
+        CHECKLIST_DATA.forEach(c => c.items.forEach(i => allIds.push(i.id)));
+        
+        let headers = ["ID_Registro", "Semana", "Sala", "Folhas_PDF", "Total_Erros", ...allIds.map(id => `Erro_${id}`)];
+        let rows = [headers.join(",")];
+        
+        kpiDataEngine.forEach(r => {
+            let row = [r.id, r.week, r.room, r.sheets, r.errors.length];
+            allIds.forEach(id => {
+                row.push(r.errors.includes(id) ? 1 : 0);
+            });
+            rows.push(row.join(","));
+        });
+        
+        const csvContent = rows.join("\n");
+        const blob = new Blob(["\ufeff", csvContent], { type: 'text/csv;charset=utf-8;' }); 
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `Base_PowerBI_Qualidade_${new Date().toISOString().split('T')[0]}.csv`;
+        link.click();
+    }
+
     // Inicialização da Tela
     window.addEventListener('DOMContentLoaded', () => {
       initApp();
       window.addEventListener('beforeprint', () => { document.documentElement.classList.remove('dark'); });
-      window.addEventListener('afterprint', () => { if (state.darkMode) document.documentElement.classList.add('dark'); });
+      window.addEventListener('afterprint', () => { if (state.darkMode) { document.documentElement.classList.add('dark'); } });
     });
   </script>
 </body>
