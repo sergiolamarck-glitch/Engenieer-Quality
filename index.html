@@ -7,8 +7,12 @@
   
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <script src="https://cdn.tailwindcss.com"></script>
+  
   <!-- Chart.js para o Gráfico Analítico -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- SheetJS para Exportação Nativa em Excel (.xlsx) com colunas definidas -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
   <script>
     tailwind.config = {
@@ -25,7 +29,18 @@
             }
           },
           animation: {
-            'fadeIn': 'fadeIn 0.25s ease-out forwards'
+            'fadeIn': 'fadeIn 0.25s ease-out forwards',
+            'slideDown': 'slideDown 0.3s ease-out forwards'
+          },
+          keyframes: {
+            fadeIn: {
+              '0%': { opacity: '0' },
+              '100%': { opacity: '1' },
+            },
+            slideDown: {
+              '0%': { opacity: '0', transform: 'translateY(-10px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            }
           }
         }
       }
@@ -78,7 +93,7 @@
         <div>
           <div class="flex items-center gap-1.5">
             <h1 id="header-title" class="text-base font-black tracking-tight text-brand dark:text-white">Engenharia & Qualidade</h1>
-            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-900">▲ REV 2.7</span>
+            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-900">▲ REV 2.8</span>
           </div>
           <p id="header-subtitle" class="text-[10px] font-bold uppercase tracking-widest text-zinc-400 dark:text-brand-light">Painel Integrado: CQ, HVAC, Piping e Bandejas</p>
         </div>
@@ -395,9 +410,9 @@
                         <button onclick="clearKpiMemory()" class="w-full sm:w-auto bg-rose-100 text-rose-700 px-5 py-2.5 rounded-lg font-black shadow-md hover:bg-rose-200 transition-all flex justify-center items-center gap-2 text-xs uppercase tracking-wider">
                             🗑️ Limpar Memória (KPI)
                         </button>
-                        <button onclick="exportKpiCSV()" class="w-full sm:w-auto bg-[#107c41] text-white px-5 py-2.5 rounded-lg font-black shadow-md hover:bg-[#0c5d31] transition-all flex justify-center items-center gap-2 text-xs uppercase tracking-wider">
+                        <button onclick="exportKpiExcel()" class="w-full sm:w-auto bg-[#107c41] text-white px-5 py-2.5 rounded-lg font-black shadow-md hover:bg-[#0c5d31] transition-all flex justify-center items-center gap-2 text-xs uppercase tracking-wider">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                            Exportar Base
+                            Exportar Planilha Excel
                         </button>
                     </div>
                 </div>
@@ -440,44 +455,43 @@
 
   <script>
     // -------------------------------------------------------------
-    // DADOS NATIVOS DA APLICAÇÃO (Matriz Atualizada: 1 ao 20)
+    // DADOS NATIVOS DA APLICAÇÃO (Matriz Atualizada com SVGs visuais)
     // -------------------------------------------------------------
     
-    // Matriz Atualizada para mostrar os números exatos (1 ao 20) para bater perfeitamente com o Gráfico e com a Auditoria
     const CHECKLIST_DATA = [
       {
         category: "Verificações do Carimbo (Selo)",
         items: [
-          { id: "chk1", text: "1. Data de emissão atualizada?", tag: "Data" },
-          { id: "chk2", text: "2. Nomes do contratante corretos (M. Puis...)?", tag: "Nomes" },
-          { id: "chk3", text: "3. Número total de folhas correto?", tag: "Folhas" },
-          { id: "chk4", text: "4. Nome da folha, DMS e Employer de acordo com a MDL?", tagImportant: "CRÍTICO" },
-          { id: "chk5", text: "5. Final do Employer ID alterado para 584xXXX?", tagImportant: "IMPORTANTE" },
-          { id: "chk11", text: "6. Verificação de carimbo - Numero de folhas e escalas..." },
-          { id: "chk12", text: "7. Titulo do desenho corresponde ao nome do carimbo..." },
-          { id: "chk13", text: "8. Alinhamento do textos no carimbo..." }
+          { id: "chk1", text: "1. Data de emissão atualizada?", tag: "Data", svg: `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><path d="M9 16l2 2 4-4"></path></svg>` },
+          { id: "chk2", text: "2. Nomes do contratante corretos (M. Puis...)?", tag: "Nomes", svg: `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>` },
+          { id: "chk3", text: "3. Número total de folhas correto?", tag: "Folhas", svg: `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>` },
+          { id: "chk4", text: "4. Nome da folha, DMS e Employer de acordo com a MDL?", tagImportant: "CRÍTICO", svg: `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 3v5h5M16 13H8M16 17H8M10 9H8"/></svg>` },
+          { id: "chk5", text: "5. Final do Employer ID alterado para 584xXXX?", tagImportant: "IMPORTANTE", svg: `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"></rect><circle cx="8" cy="12" r="2"></circle><line x1="14" y1="10" x2="18" y2="10"></line><line x1="14" y1="14" x2="18" y2="14"></line></svg>` },
+          { id: "chk11", text: "6. Verificação de carimbo - Numero de folhas e escalas...", svg: `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6"></path><path d="M12 18v4"></path><path d="M4 12H2"></path><path d="M22 12h-2"></path><rect x="6" y="8" width="12" height="8" rx="2"></rect></svg>` },
+          { id: "chk12", text: "7. Titulo do desenho corresponde ao nome do carimbo...", svg: `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"></polyline><line x1="9" y1="20" x2="15" y2="20"></line><line x1="12" y1="4" x2="12" y2="20"></line></svg>` },
+          { id: "chk13", text: "8. Alinhamento do textos no carimbo...", svg: `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"></line><line x1="8" y1="12" x2="16" y2="12"></line><line x1="4" y1="18" x2="20" y2="18"></line></svg>` }
         ]
       },
       {
         category: "Verificações de Desenho e Layout",
         items: [
-          { id: "chk6", text: "9. Nivel e Norte corretos?", tagImportant: "CRÍTICO" },
-          { id: "chk7", text: "10. Escala geral (carimbo) e escalas dos elementos...", tag: "Escala" },
-          { id: "chk8", text: "11. Numeração dos cortes sequencial e correta...", tag: "Cortes" },
-          { id: "chk9", text: "12. Viewports desativadas (trancadas)?", tag: "Viewport" },
-          { id: "chk10", text: "13. Arquivo salvo com a visualização no Layout...", tag: "Finalização" },
-          { id: "chk14", text: "14. Verificar se o desenho não foi cortado pela viewport" },
-          { id: "chk15", text: "15. Verificar numeração da linha corte e Cortes..." },
-          { id: "chk16", text: "16. Foi verificado a correspondencia do Keyplant com a sala..." },
-          { id: "chk17", text: "17. A tabela está com a 3,5mm na viewport?..." }
+          { id: "chk6", text: "9. Nivel e Norte corretos?", tagImportant: "CRÍTICO", svg: `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 4l2 6h-4z" fill="currentColor"/><line x1="2" y1="22" x2="22" y2="22"/></svg>` },
+          { id: "chk7", text: "10. Escala geral (carimbo) e escalas dos elementos...", tag: "Escala", svg: `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="10" width="20" height="8" rx="2"></rect><line x1="6" y1="10" x2="6" y2="14"></line><line x1="10" y1="10" x2="10" y2="12"></line><line x1="14" y1="10" x2="14" y2="14"></line><line x1="18" y1="10" x2="18" y2="12"></line></svg>` },
+          { id: "chk8", text: "11. Numeração dos cortes sequencial e correta...", tag: "Cortes", svg: `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></svg>` },
+          { id: "chk9", text: "12. Viewports desativadas (trancadas)?", tag: "Viewport", svg: `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>` },
+          { id: "chk10", text: "13. Arquivo salvo com a visualização no Layout...", tag: "Finalização", svg: `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>` },
+          { id: "chk14", text: "14. Verificar se o desenho não foi cortado pela viewport", svg: `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v14a2 2 0 0 0 2 2h14"></path><path d="M18 22V8a2 2 0 0 0-2-2H2"></path></svg>` },
+          { id: "chk15", text: "15. Verificar numeração da linha corte e Cortes...", svg: `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="12" x2="20" y2="12" stroke-dasharray="4 4"></line><circle cx="4" cy="12" r="2"></circle><circle cx="20" cy="12" r="2"></circle></svg>` },
+          { id: "chk16", text: "16. Foi verificado a correspondencia do Keyplant com a sala...", svg: `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M9 3v18"></path><path d="M3 9h18"></path><rect x="3" y="3" width="6" height="6" fill="currentColor"></rect></svg>` },
+          { id: "chk17", text: "17. A tabela está com a 3,5mm na viewport?...", svg: `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line><text x="11.5" y="17" font-size="6" font-family="sans-serif" font-weight="bold" fill="currentColor" stroke="none">3.5</text></svg>` }
         ]
       },
       {
         category: "Cover Sheet, Tabelas e Quantitativos",
         items: [
-          { id: "chk18", text: "18. Alinhamentos dos símbolos na tabela estão centralizados..." },
-          { id: "chk19", text: "19. Cover sheet corresponde a numeração e quantidade..." },
-          { id: "chk20", text: "20. Contagem de elementos feitos e verificados?" }
+          { id: "chk18", text: "18. Alinhamentos dos símbolos na tabela estão centralizados...", svg: `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"></rect><line x1="12" y1="4" x2="12" y2="20"></line><circle cx="12" cy="12" r="2" fill="currentColor"></circle></svg>` },
+          { id: "chk19", text: "19. Cover sheet corresponde a numeração e quantidade...", svg: `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><path d="M13 2v7h7"></path><rect x="8" y="12" width="8" height="2" stroke="none" fill="currentColor"></rect><rect x="8" y="16" width="5" height="2" stroke="none" fill="currentColor"></rect></svg>` },
+          { id: "chk20", text: "20. Contagem de elementos feitos e verificados?", svg: `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="4" y2="18"></line><line x1="9" y1="6" x2="9" y2="18"></line><line x1="14" y1="6" x2="14" y2="18"></line><line x1="19" y1="6" x2="19" y2="18"></line><line x1="2" y1="12" x2="22" y2="12" stroke="currentColor" opacity="0.5"></line></svg>` }
         ]
       }
     ];
@@ -581,16 +595,10 @@
       tagInput: '#BAL.BA11=751&LD041-000543'
     };
 
-    // Variavel de Memória Local para o Sub-App KPI
     let kpiDataEngine = JSON.parse(localStorage.getItem('CQ_KPI_Data_Engine')) || [];
-    let kpiChartInstance = null; // Guarda a instancia do Chart.js
+    let kpiChartInstance = null;
 
-    // [!!!] URL DE WEBHOOK (FORMSPREE, MAKE, N8N, APPS SCRIPT) PARA FUNCIONAR COMO FORMS NO GITHUB PAGES [!!!]
     const CLOUD_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzQEf_YuItBkLcKCjXmXBPRSLWaay5-9ImngJWctdzPmqns35W3iU_bFcKlFanUTlHwJw/exec"; 
-
-    // -------------------------------------------------------------
-    // LOGICA PRINCIPAL DA APLICAÇÃO (UI, Modals e HVAC/Trays)
-    // -------------------------------------------------------------
 
     function initApp() {
       if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
@@ -697,8 +705,23 @@
     }
 
     function toggleChecklist(itemId, action = 'checked') {
-      if (state.checkedItems[itemId] === action) { delete state.checkedItems[itemId]; } 
-      else { state.checkedItems[itemId] = action; }
+      const flatItems = [];
+      CHECKLIST_DATA.forEach(cat => cat.items.forEach(item => flatItems.push(item.id)));
+      
+      const currentIdx = flatItems.indexOf(itemId);
+      const previousItemId = currentIdx > 0 ? flatItems[currentIdx - 1] : null;
+
+      if (previousItemId && !state.checkedItems[previousItemId]) return;
+
+      if (state.checkedItems[itemId] === action) { 
+        delete state.checkedItems[itemId];
+        for(let i = currentIdx + 1; i < flatItems.length; i++) {
+           delete state.checkedItems[flatItems[i]];
+        }
+      } 
+      else { 
+        state.checkedItems[itemId] = action; 
+      }
       renderChecklist();
     }
 
@@ -707,13 +730,14 @@
       renderChecklist();
     }
 
-    // RENDER: ABA DO CHECKLIST (Com Botão KPI flutuando APENAS aqui)
     function renderChecklist() {
       let totalItems = 0;
       let checkedCount = 0;
-
+      
+      const flatItems = [];
       CHECKLIST_DATA.forEach(cat => {
         cat.items.forEach(item => {
+          flatItems.push(item.id);
           totalItems++;
           if (state.checkedItems[item.id]) checkedCount++; 
         });
@@ -735,29 +759,87 @@
                   const isNa = status === 'na';
                   const isDone = isChecked || isNa;
                   
+                  const currentIdx = flatItems.indexOf(item.id);
+                  const previousItemId = currentIdx > 0 ? flatItems[currentIdx - 1] : null;
+                  const isLocked = previousItemId ? !state.checkedItems[previousItemId] : false;
+                  
+                  // Verifica se é o item "ativo/aberto" neste momento
+                  const isActive = !isLocked && !isDone;
+
                   let textClasses = 'text-xs leading-relaxed flex-1 mt-0.5 transition-all ';
-                  if (isDone) { textClasses += 'text-zinc-500 dark:text-zinc-400 font-semibold line-through opacity-70 '; } 
-                  else { textClasses += 'text-zinc-700 dark:text-zinc-200 font-bold '; }
+                  if (isDone) { 
+                      textClasses += 'text-zinc-500 dark:text-zinc-400 font-semibold line-through opacity-70 '; 
+                  } else if (isLocked) {
+                      textClasses += 'text-zinc-400 dark:text-zinc-600 font-medium ';
+                  } else { 
+                      textClasses += 'text-zinc-700 dark:text-zinc-200 font-bold '; 
+                  }
+                  
                   if (isDone) { textClasses += 'print-gray '; } 
                   else { textClasses += 'print-strike '; }
-                  
+
+                  let wrapperClasses = 'flex flex-col gap-3 p-3 rounded-lg border transition-all ';
+                  if (isLocked) {
+                      wrapperClasses += 'opacity-60 cursor-not-allowed bg-slate-100 border-slate-300 dark:bg-[#0a1219] dark:border-zinc-800 select-none ';
+                  } else if (isDone) {
+                      wrapperClasses += 'cursor-pointer bg-slate-50 border-brand-accent/40 dark:bg-brand-darker dark:border-brand-accent/50 ';
+                  } else {
+                      wrapperClasses += 'cursor-pointer bg-white border-brand hover:border-brand-accent dark:bg-brand dark:border-white shadow-md ';
+                  }
+
+                  let checkmarkDiv = '';
+                  if (isLocked) {
+                      checkmarkDiv = `
+                      <div class="mt-0.5 w-7 h-7 rounded-md border-2 border-slate-300 flex items-center justify-center shrink-0 bg-slate-200 text-slate-400 dark:bg-zinc-800/80 dark:border-zinc-700 dark:text-zinc-500 shadow-inner">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                      </div>`;
+                  } else {
+                      checkmarkDiv = `
+                      <div class="mt-0.5 w-7 h-7 rounded-md border flex items-center justify-center shrink-0 transition-colors ${isChecked ? 'bg-brand dark:bg-brand-accent border-brand text-white shadow-md' : (isNa ? 'bg-zinc-500 border-zinc-500 text-white dark:bg-zinc-600 dark:border-zinc-600 shadow-md' : 'border-zinc-400 dark:border-brand-light bg-transparent hover:bg-zinc-50 dark:hover:bg-brand-darker')}">
+                          ${isChecked ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>' : (isNa ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>' : '')}
+                      </div>`;
+                  }
+
+                  const naBtnClasses = isLocked
+                    ? 'bg-zinc-100 text-zinc-400 border-zinc-200 dark:bg-brand-darker dark:text-zinc-600 dark:border-brand-light cursor-not-allowed opacity-50'
+                    : (isNa ? 'bg-zinc-600 text-white border-zinc-700 dark:bg-zinc-300 dark:text-zinc-900' : 'bg-zinc-100 text-zinc-600 border-zinc-300 hover:bg-zinc-200 dark:bg-brand-darker dark:text-zinc-300 dark:border-brand-light dark:hover:bg-brand-light/30 shadow-sm');
+
+                  const onClickAttr = isLocked ? '' : `onclick="toggleChecklist('${item.id}', 'checked')"`;
+                  const onNaClickAttr = isLocked ? '' : `onclick="event.stopPropagation(); toggleChecklist('${item.id}', 'na')"`;
+
+                  const lockBadge = isLocked 
+                    ? `<span class="px-2 py-0.5 rounded text-[10px] font-black bg-rose-50 text-rose-600 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-900/50 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> POKA-YOKE ATIVO</span>`
+                    : '';
+
                   return `
-                    <div class="flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${isDone ? 'bg-slate-50 border-brand-accent/40 dark:bg-brand-darker dark:border-brand-accent/50' : 'bg-white border-zinc-200 hover:border-brand-accent/60 dark:bg-brand dark:border-brand-light dark:hover:border-white/50'}" onclick="toggleChecklist('${item.id}', 'checked')">
-                      <div class="mt-0.5 w-5 h-5 rounded border flex items-center justify-center shrink-0 transition-colors ${isChecked ? 'bg-brand dark:bg-brand-accent border-brand text-white' : (isNa ? 'bg-zinc-400 border-zinc-400 text-white dark:bg-zinc-600 dark:border-zinc-600' : 'border-zinc-300 dark:border-brand-light bg-transparent')}">
-                        ${isChecked ? '✓' : (isNa ? '-' : '')}
+                    <div class="${wrapperClasses}" ${onClickAttr}>
+                      <div class="flex items-start gap-3">
+                          ${checkmarkDiv}
+                          <div class="flex-1 flex flex-col sm:flex-row sm:items-start justify-between gap-2">
+                            <span class="${textClasses}">${item.text}</span>
+                            <div class="flex flex-wrap gap-2 shrink-0 mt-2 sm:mt-0 items-center no-print">
+                              <button ${isLocked ? 'disabled' : ''} ${onNaClickAttr} class="px-3 py-1 rounded-md text-[10px] font-bold border transition-all ${naBtnClasses}">N/A</button>
+                              ${item.tag ? `<span class="px-2 py-0.5 rounded text-[10px] font-medium bg-zinc-100 text-zinc-600 dark:bg-brand-darker dark:text-zinc-300 border border-zinc-200 dark:border-brand-light">${item.tag}</span>` : ''}
+                              ${item.tagImportant ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-700 dark:bg-rose-950/60 dark:text-rose-300 border border-amber-200 dark:border-rose-900">${item.tagImportant}</span>` : ''}
+                              ${lockBadge}
+                            </div>
+                            <div class="print-area-corretor ml-2 border-l-2 border-zinc-300 pl-3 flex items-center gap-2 shrink-0">
+                               <span class="text-[9px] font-black uppercase text-zinc-500 tracking-wider">Corretor</span>
+                               <div class="w-5 h-5 border-2 border-black rounded-sm bg-white shadow-sm flex-shrink-0"></div>
+                            </div>
+                          </div>
                       </div>
-                      <div class="flex-1 flex flex-col sm:flex-row sm:items-start justify-between gap-2">
-                        <span class="${textClasses}">${item.text}</span>
-                        <div class="flex flex-wrap gap-2 shrink-0 mt-2 sm:mt-0 items-center no-print">
-                          <button onclick="event.stopPropagation(); toggleChecklist('${item.id}', 'na')" class="px-2 py-0.5 rounded text-[10px] font-bold border transition-colors ${isNa ? 'bg-zinc-600 text-white border-zinc-700 dark:bg-zinc-300 dark:text-zinc-900' : 'bg-zinc-100 text-zinc-500 border-zinc-200 hover:bg-zinc-200 dark:bg-brand-darker dark:text-zinc-400 dark:border-brand-light dark:hover:bg-brand-light/30'}">N/A</button>
-                          ${item.tag ? `<span class="px-2 py-0.5 rounded text-[10px] font-medium bg-zinc-100 text-zinc-600 dark:bg-brand-darker dark:text-zinc-300">${item.tag}</span>` : ''}
-                          ${item.tagImportant ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-700 dark:bg-rose-950/60 dark:text-rose-300">${item.tagImportant}</span>` : ''}
+                      ${(isActive && item.svg) ? `
+                        <div class="mt-2 pt-3 border-t border-brand-accent/20 flex items-center gap-4 bg-brand/5 dark:bg-brand-light/10 p-3 rounded-lg animate-slideDown shadow-inner">
+                          <div class="w-12 h-12 flex-shrink-0 flex items-center justify-center bg-white dark:bg-brand-darker rounded-full shadow border border-zinc-300 dark:border-brand-light text-brand dark:text-brand-accent">
+                             ${item.svg}
+                          </div>
+                          <div class="flex flex-col">
+                             <span class="text-[9px] font-black uppercase tracking-widest text-zinc-500 dark:text-zinc-400">Inspeção Requerida Agora</span>
+                             <span class="text-xs font-bold text-brand dark:text-white">Verifique este item no desenho.</span>
+                          </div>
                         </div>
-                        <div class="print-area-corretor ml-2 border-l-2 border-zinc-300 pl-3 flex items-center gap-2 shrink-0">
-                           <span class="text-[9px] font-black uppercase text-zinc-500 tracking-wider">Corretor</span>
-                           <div class="w-5 h-5 border-2 border-black rounded-sm bg-white shadow-sm flex-shrink-0"></div>
-                        </div>
-                      </div>
+                      ` : ''}
                     </div>
                   `;
                 }).join('')}
@@ -811,7 +893,7 @@
             ${renderCategoriesBlock(CHECKLIST_DATA)}
           </div>
           
-          <!-- BOTÃO FLUTUANTE DE KPI (Visível APENAS na aba Checklist) -->
+          <!-- BOTÃO FLUTUANTE DE KPI -->
           <div class="fixed bottom-6 right-6 z-40 flex flex-col gap-3 no-print">
             <button onclick="openKpiApp()" class="bg-rose-600 hover:bg-rose-700 text-white rounded-full w-14 h-14 shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.2)] transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center group border border-rose-400 outline-none">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
@@ -983,7 +1065,7 @@
           </div>
         </div>
         
-        <!-- BOTÕES FLUTUANTES (Exibidos APENAS nas abas de Bandejas) -->
+        <!-- BOTÕES FLUTUANTES -->
         <div class="fixed bottom-6 right-6 z-40 flex flex-col gap-3 no-print">
             <button onclick="openModal('modal-work-aid')" class="bg-orange-600 hover:bg-orange-700 text-white rounded-full w-14 h-14 shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.2)] transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center group border border-orange-400 outline-none">
               <span class="font-black text-xl">WA</span>
@@ -999,6 +1081,14 @@
       updateDmsTagConversion(); 
     }
 
+    function updateDmsTagConversion() {
+      const dmsEl = document.getElementById('dms-val-input');
+      const tagEl = document.getElementById('tag-val-input');
+      const resEl = document.getElementById('dms-conversion-result');
+      if (dmsEl && tagEl && resEl) {
+        resEl.innerText = `${tagEl.value.replace('584420', dmsEl.value)}`;
+      }
+    }
 
     // -------------------------------------------------------------
     // LOGICA DO NOVO SUB-APP DE KPIs & ANALYTICS (Modal Independente)
@@ -1045,7 +1135,6 @@
         }
     }
 
-    // Renderiza a lista EXATA do checklist mestre
     function renderKpiRegisterChecklist() {
         const container = document.getElementById('kpi-form-checklist');
         if(!container) return;
@@ -1070,15 +1159,14 @@
         container.innerHTML = html;
     }
 
-    // Integração com Banco de Dados Nuvem / Formulário via Webhook (Google Apps Script)
     async function sendDataToCloud(record) {
-        if (!CLOUD_WEBHOOK_URL) return; // Funciona offline se a URL estiver vazia
+        if (!CLOUD_WEBHOOK_URL) return;
         try {
             await fetch(CLOUD_WEBHOOK_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(record),
-                mode: 'no-cors' // Evita erros de CORS do GitHub Pages para Apps Script
+                mode: 'no-cors'
             });
         } catch (error) {
             console.error("Falha ao sincronizar com a nuvem:", error);
@@ -1114,13 +1202,10 @@
             timestamp: new Date().toISOString()
         };
 
-        // Salva Localmente (Para uso próprio do Dashboard)
         kpiDataEngine.push(record);
         
         try {
             localStorage.setItem('CQ_KPI_Data_Engine', JSON.stringify(kpiDataEngine));
-            
-            // Envia para Nuvem Assincronamente (P/ Consolidar Várias Pessoas num "Forms")
             sendDataToCloud(record);
 
             roomEl.value = '';
@@ -1140,11 +1225,10 @@
         if(confirm('Deseja excluir permanentemente o registro desta sala?')) {
             kpiDataEngine = kpiDataEngine.filter(r => r.id !== recordId);
             localStorage.setItem('CQ_KPI_Data_Engine', JSON.stringify(kpiDataEngine));
-            renderKpiDashboard(); // Atualiza a tela imediatamente
+            renderKpiDashboard(); 
         }
     }
 
-    // Botão Limpar Memória (Apaga tudo do LocalStorage no App KPI)
     function clearKpiMemory() {
         if(confirm("ATENÇÃO: Tem certeza que deseja APAGAR TODAS as salas salvas na memória deste navegador? (Isso resetará todos os gráficos locais)")) {
             kpiDataEngine = [];
@@ -1153,7 +1237,6 @@
         }
     }
 
-    // Renderiza o Dashboard com Gráfico Horizontal Limpo
     function renderKpiDashboard() {
         const filter = document.getElementById('kpi-filter-week').value;
         let filtered = filter === 'ALL' ? kpiDataEngine : kpiDataEngine.filter(r => r.week === filter);
@@ -1161,7 +1244,6 @@
         const totalRooms = filtered.length;
         let totalErrors = 0;
         
-        // Estrutura p/ contagem
         const errorCounts = {};
         CHECKLIST_DATA.forEach(cat => cat.items.forEach(i => errorCounts[i.id] = { text: i.text, count: 0 }));
         
@@ -1176,7 +1258,6 @@
         document.getElementById('kpi-stat-errors').innerText = totalErrors;
         document.getElementById('kpi-stat-avg').innerText = totalRooms > 0 ? (totalErrors/totalRooms).toFixed(1) : '0.0';
 
-        // Atualizar Tabela de Memória (Salas Salvas)
         const memoryTable = document.getElementById('kpi-memory-table');
         if (totalRooms === 0) {
             memoryTable.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-zinc-400 italic">Nenhuma sala registrada neste filtro temporal.</td></tr>`;
@@ -1197,11 +1278,9 @@
             memoryTable.innerHTML = tableHtml;
         }
 
-        // Gráfico Bar Vertical (Chart.js) estilo Excel
         const labels = [];
         const dataPoints = [];
         
-        // Mantem a ordem do array CHECKLIST_DATA
         CHECKLIST_DATA.forEach(cat => {
             cat.items.forEach(item => {
                 let txt = item.text.length > 35 ? item.text.substring(0, 35) + '...' : item.text;
@@ -1223,7 +1302,7 @@
                 datasets: [{
                     label: '% do Total de Erros',
                     data: dataPoints,
-                    backgroundColor: '#4f81bd', // Cor Azul estilo Excel
+                    backgroundColor: '#4f81bd', 
                     borderColor: '#385d8a',
                     borderWidth: 1
                 }]
@@ -1283,32 +1362,43 @@
         });
     }
 
-    function exportKpiCSV() {
+    function exportKpiExcel() {
         if(kpiDataEngine.length === 0) return alert("Sem dados para exportar.");
-        let allIds = [];
-        CHECKLIST_DATA.forEach(c => c.items.forEach(i => allIds.push(i.id)));
         
-        let headers = ["ID_Registro", "Semana", "Sala", "Folhas_PDF", "Total_Erros", ...allIds.map(id => `Erro_${id}`)];
-        let rows = [headers.join(",")];
+        let headers = ["ID_Registro", "Semana", "Sala", "Folhas_PDF", "Total_Erros"];
+        CHECKLIST_DATA.forEach(c => c.items.forEach(i => headers.push(i.text)));
+        
+        let dataToExport = [headers];
         
         kpiDataEngine.forEach(r => {
             let row = [r.id, r.week, r.room, r.sheets, r.errors.length];
-            allIds.forEach(id => {
-                row.push(r.errors.includes(id) ? 1 : 0);
+            CHECKLIST_DATA.forEach(c => {
+                c.items.forEach(item => {
+                    row.push(r.errors.includes(item.id) ? 1 : 0);
+                });
             });
-            rows.push(row.join(","));
+            dataToExport.push(row);
         });
         
-        const csvContent = rows.join("\n");
-        const blob = new Blob(["\ufeff", csvContent], { type: 'text/csv;charset=utf-8;' }); 
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `Base_PowerBI_Qualidade_${new Date().toISOString().split('T')[0]}.csv`;
-        link.click();
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet(dataToExport);
+        
+        const colWidths = [
+            { wch: 20 }, 
+            { wch: 15 }, 
+            { wch: 15 }, 
+            { wch: 12 }, 
+            { wch: 12 }, 
+        ];
+        CHECKLIST_DATA.forEach(c => c.items.forEach(i => colWidths.push({ wch: 30 })));
+        ws['!cols'] = colWidths;
+
+        XLSX.utils.book_append_sheet(wb, ws, "Base_Erros");
+        
+        const filename = `Base_PowerBI_Qualidade_${new Date().toISOString().split('T')[0]}.xlsx`;
+        XLSX.writeFile(wb, filename);
     }
 
-    // Inicialização da Tela
     window.addEventListener('DOMContentLoaded', () => {
       initApp();
       window.addEventListener('beforeprint', () => { document.documentElement.classList.remove('dark'); });
